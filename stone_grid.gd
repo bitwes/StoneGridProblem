@@ -1,11 +1,9 @@
+class_name StoneGrid
 extends Control
 
 
 var StoneButtonScene = load('res://stone_button.tscn')
 var _rows = []
-
-
-
 
 var _from : StoneButton = null
 var _stone_buttons = []
@@ -31,28 +29,34 @@ func _on_stone_button_toggled(which : StoneButton):
 			which.button_pressed = false
 		else:
 			_from = which
-	elif(_from.grid_pos.distance_to(which.grid_pos) == 1.0):
-		move_stone(_from, which)
-		_from.button_pressed = false
-		_from.release_focus()
-		which.button_pressed = false
-		which.release_focus()
-		_from = null
 	else:
+		move_stone(_from.grid_pos, which.grid_pos)
 		_from.button_pressed = false
 		_from.release_focus()
 		which.button_pressed = false
 		which.release_focus()
 		_from = null
-		print('invalid move')
-		
 
 
-func move_stone(from : StoneButton, to : StoneButton):
-	from .stones -= 1
-	to.stones += 1
-	moves += 1
-	_undo.append([from, to])
+func move_stone(from : Vector2, to : Vector2):
+	var from_btn = _stone_buttons[from.x][from.y]
+	var to_btn = _stone_buttons[to.x][to.y]
+
+	if(from_btn != to_btn and from.distance_to(to) == 1.0 and from_btn.stones > 0):
+		print(from_btn, ' -> ', to_btn)
+		from_btn .stones -= 1
+		to_btn.stones += 1
+		moves += 1
+		_undo.append([from, to])
+		print_board()
+		return true
+	else:
+		print('invalid move ', from_btn, ' -> ', to_btn)
+		return false
+
+
+func get_stones_at(pos):
+	return _stone_buttons[pos.x][pos.y].stones
 
 
 func undo():
@@ -102,9 +106,38 @@ func reset():
 		moves = 0
 
 
+func size():
+	return _stone_buttons.size()
+
 func _on_undo_pressed():
 	undo()
 
 
 func _on_reset_pressed():
 	reset()
+
+
+func print_board():
+	print("".lpad(10, '-'))
+	for i in range(size()):
+		var rowstr = '|'
+		for j in range(size()):
+			rowstr += str(get_stones_at(Vector2(i, j)), '|').lpad(3, ' ')
+		print(rowstr)
+	print("".lpad(10, '-'))
+
+func get_button_at(pos : Vector2):
+	return _stone_buttons[pos.x][pos.y]
+
+
+func get_num_wrong():
+	var num_wrong = 0
+	for i in range(size()):
+		for j in range(size()):
+			if(_stone_buttons[i][j].stones != 1):
+				num_wrong += 1
+	return num_wrong
+	
+
+func is_solved():
+	return get_num_wrong() == 0	

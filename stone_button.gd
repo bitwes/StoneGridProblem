@@ -21,3 +21,6 @@ func _init():
 func _ready():
 	if(stones == -1):
 		text = str(grid_pos)
+
+func _to_string():
+	return str(grid_pos, '[', stones, ']')

@@ -39,6 +39,25 @@ text = "Center 9"
 layout_mode = 2
 text = "Center Line 3"
 
+[node name="Harder" type="Button" parent="Controls/Layout"]
+layout_mode = 2
+text = "Harder"
+
+[node name="HarderInverse" type="Button" parent="Controls/Layout"]
+layout_mode = 2
+text = "Harder"
+
+[node name="CenterContainer" type="CenterContainer" parent="Controls/Layout"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Solve" type="Button" parent="Controls/Layout"]
+layout_mode = 2
+text = "Solve"
+
 [connection signal="pressed" from="Controls/Layout/DiagThrees" to="." method="_on_diag_threes_pressed"]
 [connection signal="pressed" from="Controls/Layout/CenterNine" to="." method="_on_center_nine_pressed"]
 [connection signal="pressed" from="Controls/Layout/CenterLineThree" to="." method="_on_center_line_three_pressed"]
+[connection signal="pressed" from="Controls/Layout/Harder" to="." method="_on_harder_pressed"]
+[connection signal="pressed" from="Controls/Layout/HarderInverse" to="." method="_on_harder_inverse_pressed"]
+[connection signal="pressed" from="Controls/Layout/Solve" to="." method="_on_solve_pressed"]

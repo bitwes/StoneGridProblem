@@ -29,9 +29,29 @@ var three_center_line = [
 	[0, 3, 0]
 ]
 
+var harder = [
+	[5, 0, 0],
+	[0, 2, 0],
+	[2, 0, 0]	
+]
+
+var harder_inverse = [
+	[0, 0, 2],
+	[0, 2, 0],
+	[0, 0, 5]		
+]
+
 func _ready():
 	$StoneGrid.set_grid_size(3)
-	$StoneGrid.populate(nine_center)
+	$StoneGrid.populate(harder)
+	
+	
+func solve():
+	pass
+
+
+func _on_solve_pressed():
+	solve()
 
 
 func _on_diag_threes_pressed():
@@ -44,3 +64,11 @@ func _on_center_nine_pressed():
 
 func _on_center_line_three_pressed():
 	$StoneGrid.populate(three_center_line)
+
+
+func _on_harder_pressed():
+	$StoneGrid.populate(harder)
+
+
+func _on_harder_inverse_pressed():
+	$StoneGrid.populate(harder_inverse)
