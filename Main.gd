@@ -47,8 +47,12 @@ func _ready():
 
 
 func solve():
+	$StoneGrid.wait_time = $Controls/Layout/Delay.value
+	$Controls.visible = false
 	var solver = Solvers.ThisOne.new()
-	solver.solve($StoneGrid)
+	await solver.solve($StoneGrid)
+	$Controls.visible = true
+	$StoneGrid.wait_time = 0
 
 
 func _on_solve_pressed():

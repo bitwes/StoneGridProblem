@@ -3,12 +3,13 @@ extends Control
 
 
 var StoneButtonScene = load('res://stone_button.tscn')
-var _rows = []
 
 var _from : StoneButton = null
 var _stone_buttons = []
 var _undo = []
 var _last_layout = null
+
+var wait_time = 0
 
 var moves = 0 :
 	get: return moves
@@ -44,11 +45,19 @@ func move_stone(from : Vector2, to : Vector2):
 
 	if(from_btn != to_btn and from.distance_to(to) == 1.0 and from_btn.stones > 0):
 		print(from_btn, ' -> ', to_btn)
+		if(wait_time > 0):
+			from_btn.modulate = Color(1, 0, 0)
+			to_btn.modulate = Color(0, 1, 0)
 		from_btn .stones -= 1
 		to_btn.stones += 1
 		moves += 1
 		_undo.append([from, to])
 		print_board()
+		if(wait_time > 0):
+			await get_tree().create_timer(wait_time).timeout
+			from_btn.modulate = Color(1, 1, 1)
+			to_btn.modulate = Color(1, 1, 1)
+
 		return true
 	else:
 		print('invalid move ', from_btn, ' -> ', to_btn)
