@@ -1,0 +1,53 @@
+[gd_scene load_steps=2 format=3 uid="uid://f1piuchuokq"]
+
+[ext_resource type="Script" path="res://stone_grid.gd" id="1_pcr08"]
+
+[node name="StoneGrid" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 458.0
+offset_bottom = 352.0
+script = ExtResource("1_pcr08")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.152941, 0.152941, 0.152941, 1)
+
+[node name="Layout" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Header" type="HBoxContainer" parent="Layout"]
+layout_mode = 2
+
+[node name="Moves" type="Label" parent="Layout/Header"]
+layout_mode = 2
+text = "Moves:  999"
+
+[node name="CenterContainer" type="CenterContainer" parent="Layout/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Undo" type="Button" parent="Layout/Header"]
+layout_mode = 2
+text = "Undo"
+
+[node name="Reset" type="Button" parent="Layout/Header"]
+layout_mode = 2
+text = "Reset"
+
+[node name="Grid" type="VBoxContainer" parent="Layout"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[connection signal="pressed" from="Layout/Header/Undo" to="." method="_on_undo_pressed"]
+[connection signal="pressed" from="Layout/Header/Reset" to="." method="_on_reset_pressed"]
