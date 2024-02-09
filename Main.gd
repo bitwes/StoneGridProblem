@@ -1,10 +1,10 @@
 extends Node2D
 # ------------------------------------------------------------------------------
-# You are given a 0-indexed, 2D integer matrix grid of 3 * 3, representing the 
-# number of stones in each cell. The grid contains exactly 9 stones, and there 
+# You are given a 0-indexed, 2D integer matrix grid of 3 * 3, representing the
+# number of stones in each cell. The grid contains exactly 9 stones, and there
 # are multiple stones in a single cell.
 #
-# In one move, you can move a single stone from its current cell to any other 
+# In one move, you can move a single stone from its current cell to any other
 # cell if the two cells share a side.
 #
 # Return the minimum number of moves required to place one stone in each cell.
@@ -16,7 +16,7 @@ var diag_three = [
 		[0, 3, 0],
 		[0, 0, 3]
 	]
-	
+
 var nine_center = [
 	[0, 0, 0],
 	[0, 9, 0],
@@ -32,22 +32,23 @@ var three_center_line = [
 var harder = [
 	[5, 0, 0],
 	[0, 2, 0],
-	[2, 0, 0]	
+	[2, 0, 0]
 ]
 
 var harder_inverse = [
 	[0, 0, 2],
 	[0, 2, 0],
-	[0, 0, 5]		
+	[0, 0, 5]
 ]
 
 func _ready():
 	$StoneGrid.set_grid_size(3)
 	$StoneGrid.populate(harder)
-	
-	
+
+
 func solve():
-	pass
+	var solver = Solvers.ThisOne.new()
+	solver.solve($StoneGrid)
 
 
 func _on_solve_pressed():
