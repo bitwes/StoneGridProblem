@@ -143,7 +143,7 @@ func get_num_wrong():
 	var num_wrong = 0
 	for i in range(size()):
 		for j in range(size()):
-			if(_stone_buttons[i][j].stones != 1):
+			if(_stone_buttons[i][j].stones > 1):
 				num_wrong += 1
 	return num_wrong
 	

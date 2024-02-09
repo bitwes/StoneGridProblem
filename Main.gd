@@ -11,39 +11,86 @@ extends Node2D
 # ------------------------------------------------------------------------------
 
 
-var diag_three = [
+var three_x_three = {
+	
+	diag_three = [
 		[3, 0, 0],
 		[0, 3, 0],
 		[0, 0, 3]
+	],
+
+	nine_center = [
+		[0, 0, 0],
+		[0, 9, 0],
+		[0, 0, 0]
+	],
+
+	three_center_line = [
+		[0, 3, 0],
+		[0, 3, 0],
+		[0, 3, 0]
+	],
+
+	harder = [
+		[5, 0, 0],
+		[0, 2, 0],
+		[2, 0, 0]
+	],
+
+	harder_inverse = [
+		[0, 0, 2],
+		[0, 2, 0],
+		[0, 0, 5]
+	],
+}
+
+
+var ten_x_ten = {
+	ten_center = [
+		[0, 0, 0, 0, 0, 10, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0, 10, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0, 10, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0, 10, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0, 10, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0, 10, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0, 10, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0, 10, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0, 10, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0, 10, 0, 0, 0, 0],
+	],
+	hundred_center = [
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0, 100, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+	],
+	various_tens = [
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 10],
+		[0, 0, 10, 0, 0, 0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0, 0, 0, 0, 10, 0],
+		[10, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0, 0, 10, 0, 0, 0],
+		[0, 0, 0, 10, 0, 0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 10],
+		[0, 0, 0, 0, 10, 0, 0, 0, 0, 0],
+		[0, 0, 0, 10, 0, 0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0, 0, 0, 0, 10, 0],
 	]
+}
 
-var nine_center = [
-	[0, 0, 0],
-	[0, 9, 0],
-	[0, 0, 0]
-]
-
-var three_center_line = [
-	[0, 3, 0],
-	[0, 3, 0],
-	[0, 3, 0]
-]
-
-var harder = [
-	[5, 0, 0],
-	[0, 2, 0],
-	[2, 0, 0]
-]
-
-var harder_inverse = [
-	[0, 0, 2],
-	[0, 2, 0],
-	[0, 0, 5]
-]
 
 func _ready():
-	$StoneGrid.set_grid_size(3)
-	$StoneGrid.populate(harder)
+	$StoneGrid.set_grid_size(10)
+	$StoneGrid.populate(ten_x_ten.hundred_center)
+
+	#$StoneGrid.set_grid_size(3)
+	#$StoneGrid.populate(three_x_three.harder)
 
 
 func solve():
@@ -60,20 +107,20 @@ func _on_solve_pressed():
 
 
 func _on_diag_threes_pressed():
-	$StoneGrid.populate(diag_three)
+	$StoneGrid.populate(three_x_three.diag_three)
 
 
 func _on_center_nine_pressed():
-	$StoneGrid.populate(nine_center)
+	$StoneGrid.populate(three_x_three.nine_center)
 
 
 func _on_center_line_three_pressed():
-	$StoneGrid.populate(three_center_line)
+	$StoneGrid.populate(three_x_three.three_center_line)
 
 
 func _on_harder_pressed():
-	$StoneGrid.populate(harder)
+	$StoneGrid.populate(three_x_three.harder)
 
 
 func _on_harder_inverse_pressed():
-	$StoneGrid.populate(harder_inverse)
+	$StoneGrid.populate(three_x_three.harder_inverse)
