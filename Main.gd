@@ -12,7 +12,7 @@ extends Node2D
 
 
 var three_x_three = {
-	
+
 	diag_three = [
 		[3, 0, 0],
 		[0, 3, 0],
@@ -87,7 +87,7 @@ var ten_x_ten = {
 
 func _ready():
 	$StoneGrid.set_grid_size(10)
-	$StoneGrid.populate(ten_x_ten.hundred_center)
+	$StoneGrid.populate(ten_x_ten.various_tens)
 
 	#$StoneGrid.set_grid_size(3)
 	#$StoneGrid.populate(three_x_three.harder)

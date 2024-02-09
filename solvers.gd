@@ -4,36 +4,35 @@ class_name Solvers
 
 class ThisOne:
 	var _grid : StoneGrid = null
-	
+
 	func get_surrounding_squares(pos : Vector2):
 		var to_return = []
 		if(pos.x + 1 < _grid.size()):
 			to_return.append(_grid._stone_buttons[pos.x + 1][pos.y])
-		
+
 		if(pos.x -1 >=0):
 			to_return.append(_grid._stone_buttons[pos.x - 1][pos.y])
-		
+
 		if(pos.y + 1 < _grid.size()):
 			to_return.append(_grid._stone_buttons[pos.x][pos.y + 1])
-		
+
 		if(pos.y - 1 >= 0):
 			to_return.append(_grid._stone_buttons[pos.x][pos.y - 1])
-		
+
 		return to_return
 
 
 	func solve(grid : StoneGrid):
 		_grid = grid
 		grid.print_board()
-		
+
 		var count = 0
 		var max_attempts = 200
 		while(!_grid.is_solved() and count <= max_attempts):
-			print('===================================')
-			count += 1
+			print('===== Pass ', count, ' =====')
 			await attempt()
-			#_grid.print_board()
-			
+			count += 1
+
 		print('Passes    ', count)
 		print('Moves     ', _grid.moves)
 		print('Solved    ', _grid.is_solved())
@@ -61,20 +60,18 @@ class ThisOne:
 					closest = z
 					min_dist = dist
 		return closest
-			
 
-	func push_to_least_then_in_dir_of_zero(pos : Vector2):
-		#var around = get_surrounding_squares(pos)
-		#around.sort_custom(func(a, b): return a.stones < b.stones)
+
+	func push_in_direction_of_closest_zero(pos : Vector2):
 		var here = _grid.get_button_at(pos)
-		
+
 		if(here.stones > 1):
 			var closest_zero = get_closest_zero(pos)
 			var to = null
 			if(closest_zero != null):
 				var xdiff = closest_zero.grid_pos.x - pos.x
 				var ydiff = closest_zero.grid_pos.y - pos.y
-				
+
 				if(abs(xdiff) > abs(ydiff)):
 					to = _grid.get_button_at(pos + Vector2(sign(xdiff), 0))
 				else:
@@ -86,6 +83,4 @@ class ThisOne:
 		for i in range(_grid.size()):
 			for j in range(_grid.size()):
 				var pos = Vector2(i, j)
-				await push_to_least_then_in_dir_of_zero(pos)
-
-
+				await push_in_direction_of_closest_zero(pos)
