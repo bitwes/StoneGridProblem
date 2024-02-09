@@ -1,30 +1,10 @@
 extends Control
 
+
+var StoneButtonScene = load('res://stone_button.tscn')
 var _rows = []
 
-class StoneButton:
-	extends Button
 
-	var x = -1
-	var y = -1
-
-	var stones = -1 :
-		get: return stones
-		set(val):
-			stones = val
-			if(stones > 0):
-				text = str(stones)
-			else:
-				text = ''
-
-	func _init():
-		size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		size_flags_vertical = Control.SIZE_EXPAND_FILL
-		toggle_mode = true
-
-	func _ready():
-		if(stones == -1):
-			text = str(x, ' - ', y)
 
 
 var _from : StoneButton = null
@@ -44,20 +24,28 @@ var moves = 0 :
 }
 
 func _on_stone_button_toggled(which : StoneButton):
-	if(_from == null):
+	if(_from == which):
+		return
+	elif(_from == null):
 		if(which.stones == 0):
 			which.button_pressed = false
 		else:
 			_from = which
-	elif(abs(_from.x - which.x) == 1 or abs(_from.y - which.y) == 1):
+	elif(_from.grid_pos.distance_to(which.grid_pos) == 1.0):
 		move_stone(_from, which)
 		_from.button_pressed = false
+		_from.release_focus()
 		which.button_pressed = false
+		which.release_focus()
 		_from = null
 	else:
 		_from.button_pressed = false
+		_from.release_focus()
 		which.button_pressed = false
+		which.release_focus()
+		_from = null
 		print('invalid move')
+		
 
 
 func move_stone(from : StoneButton, to : StoneButton):
@@ -94,10 +82,10 @@ func set_grid_size(s):
 		r.size_flags_vertical = Control.SIZE_EXPAND_FILL
 		_ctrls.grid.add_child(r)
 		for j in range(s):
-			var b = StoneButton.new()
+			var b = StoneButtonScene.instantiate()
 			b.pressed.connect(_on_stone_button_toggled.bind(b))
-			b.x = i
-			b.y = j
+			b.grid_pos.x = i
+			b.grid_pos.y = j
 			r.add_child(b)
 			_stone_buttons[i][j] = b
 
