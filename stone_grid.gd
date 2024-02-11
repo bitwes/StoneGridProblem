@@ -18,9 +18,16 @@ var moves = 0 :
 
 
 @onready var _ctrls = {
-	grid = $Layout/Grid,
-	moves_label = $Layout/Header/Moves
+	grid = $Layout/Scroll/Grid,
+	moves_label = $Layout/Header/Moves,
+	edit_button = $Layout/Header/EditMode,
+	stone_count = $Layout/Header/Stones
 }
+
+var log_enabled = false
+func p(s1='', s2='', s3='', s4='', s5='', s6='', s7='', s8=''):
+	if(log_enabled):
+		print(s1, s2, s3, s4, s5, s6, s7, s8)
 
 
 func _animate_move(from_btn : StoneButton, to_btn : StoneButton, duration : float):
@@ -40,29 +47,60 @@ func _animate_move(from_btn : StoneButton, to_btn : StoneButton, duration : floa
 	return t
 
 
-func _on_stone_button_toggled(which : StoneButton):
-	if(_from == which):
-		return
-	elif(_from == null):
-		if(which.stones == 0):
-			which.button_pressed = false
-		else:
-			_from = which
+func _update_count():
+	var count = 0
+	for i in range(grid_size()):
+		for j in range(grid_size()):
+			count += _stone_buttons[i][j].stones
+	_ctrls.stone_count.text = str('Stones: ', count)
+
+
+# ------------------------
+# Events
+# ------------------------
+func _on_undo_pressed():
+	undo()
+
+
+func _on_reset_pressed():
+	reset()
+
+
+func _on_edit_mode_pressed():
+	for i in range(grid_size()):
+		for j in range(grid_size()):
+			_stone_buttons[i][j].edit_mode = _ctrls.edit_button.button_pressed
+
+
+func _on_stone_button_pressed(which : StoneButton):
+	if(which.edit_mode):
+		_update_count()
 	else:
-		move_stone(_from.grid_pos, which.grid_pos)
-		_from.button_pressed = false
-		_from.release_focus()
-		which.button_pressed = false
-		which.release_focus()
-		_from = null
+		if(_from == which):
+			return
+		elif(_from == null):
+			if(which.stones == 0):
+				which.button_pressed = false
+			else:
+				_from = which
+		else:
+			move_stone(_from.grid_pos, which.grid_pos)
+			_from.button_pressed = false
+			_from.release_focus()
+			which.button_pressed = false
+			which.release_focus()
+			_from = null
 
 
+# ------------------------
+# Public
+# ------------------------
 func move_stone(from : Vector2, to : Vector2):
 	var from_btn = _stone_buttons[from.x][from.y]
 	var to_btn = _stone_buttons[to.x][to.y]
 
 	if(from_btn != to_btn and from.distance_to(to) == 1.0 and from_btn.stones > 0):
-		print(from_btn, ' -> ', to_btn)
+		p(from_btn, ' -> ', to_btn)
 		if(wait_time > 0):
 			from_btn.modulate = Color(0, 1, 0)
 			to_btn.modulate = Color(0, 1, 0)
@@ -88,11 +126,11 @@ func get_stones_at(pos):
 
 
 func undo():
-	print('undoing ', _undo.size())
+	p('undoing ', _undo.size())
 	if(_undo.size() > 0):
 		var m = _undo.pop_back()
-		m[0].stones += 1
-		m[1].stones -= 1
+		get_button_at(m[0]).stones += 1
+		get_button_at(m[1]).stones -= 1
 		moves -= 1
 
 
@@ -114,9 +152,10 @@ func set_grid_size(s):
 		_ctrls.grid.add_child(r)
 		for j in range(s):
 			var b = StoneButtonScene.instantiate()
-			b.pressed.connect(_on_stone_button_toggled.bind(b))
+			b.pressed.connect(_on_stone_button_pressed.bind(b))
 			b.grid_pos.x = i
 			b.grid_pos.y = j
+			b.custom_minimum_size = Vector2(20, 20)
 			r.add_child(b)
 			_stone_buttons[i][j] = b
 
@@ -127,6 +166,7 @@ func populate(stones):
 	for i in stones.size():
 		for j in stones[i].size():
 			_stone_buttons[i][j].stones = stones[i][j]
+	_update_count()
 
 
 func reset():
@@ -139,23 +179,24 @@ func grid_size():
 	return _stone_buttons.size()
 
 
-func _on_undo_pressed():
-	undo()
-
-
-func _on_reset_pressed():
-	reset()
-
-
 func print_board():
-	print("".lpad(10, '-'))
+	p("".lpad(10, '-'))
 	for i in range(grid_size()):
 		var rowstr = '|'
 		for j in range(grid_size()):
 			rowstr += str(get_stones_at(Vector2(i, j)), '|').lpad(3, ' ')
-		print(rowstr)
-	print("".lpad(10, '-'))
+		p(rowstr)
+	p("".lpad(10, '-'))
 
+func print_board_array():
+	print('[')
+	for i in range(grid_size()):
+		var rowstr = "\t["
+		for j in range(grid_size()):
+			rowstr += str(get_stones_at(Vector2(i, j)), ',')
+		print(rowstr, '],')
+
+	print(']')
 
 func get_button_at(pos : Vector2):
 	return _stone_buttons[pos.x][pos.y]
@@ -172,3 +213,18 @@ func get_num_wrong():
 
 func is_solved():
 	return get_num_wrong() == 0
+
+
+func _on_print_array_pressed():
+	print_board_array()
+
+
+func save_layout():
+	_last_layout = []
+	for i in range(grid_size()):
+		_last_layout.append([])
+		for j in range(grid_size()):
+			_last_layout[i].append(_stone_buttons[i][j].stones)
+			
+	
+

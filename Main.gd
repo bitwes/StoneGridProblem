@@ -19,25 +19,21 @@ var three_x_three = {
 		[0, 3, 0],
 		[0, 0, 3]
 	],
-
 	nine_center = [
 		[0, 0, 0],
 		[0, 9, 0],
 		[0, 0, 0]
 	],
-
 	three_center_line = [
 		[0, 3, 0],
 		[0, 3, 0],
 		[0, 3, 0]
 	],
-
 	harder = [
 		[5, 0, 0],
 		[0, 2, 0],
 		[2, 0, 0]
 	],
-
 	harder_inverse = [
 		[0, 0, 2],
 		[0, 2, 0],
@@ -82,16 +78,71 @@ var ten_x_ten = {
 		[0, 0, 0, 0, 10, 0, 0, 0, 0, 0],
 		[0, 0, 0, 10, 0, 0, 0, 0, 0, 0],
 		[0, 0, 0, 0, 0, 0, 0, 0, 10, 0],
+	],
+	various_tens_two = [
+		[10,0,0,0,0,10,0,0,0,10,],
+		[0,0,0,0,0,0,0,0,0,0,],
+		[0,0,0,0,0,10,0,0,0,0,],
+		[0,0,0,0,0,0,0,0,0,0,],
+		[0,0,0,0,0,10,0,0,0,0,],
+		[0,0,0,0,0,10,0,0,0,0,],
+		[0,0,0,0,0,0,0,0,0,0,],
+		[0,0,0,0,0,10,0,0,0,0,],
+		[0,0,0,0,0,0,0,0,0,0,],
+		[10,0,0,0,0,10,0,0,0,10,],
+	],
+	corners = [
+		[25, 0, 0, 0, 0, 0, 0, 0, 0, 25],
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+		[25, 0, 0, 0, 0, 0, 0, 0, 0, 25],
+	],
+	tl = [
+		[100, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+	],
+	br = [
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 100],
 	]
 }
 @onready var _ctrls = {
-	stone_arrangements = $Controls/Layout/StoneArrangements
+	buttons_vbox = $Controls/Layout/Buttons,
+	stone_arrangements = $Controls/Layout/Buttons/StoneArrangements,
+	time = $Controls/Layout/Time,
+	delay = $Controls/Layout/Buttons/Delay
 }
 
 var _stone_grid : StoneGrid = null
 
 func _ready():
-	_create_stone_grid(3, three_x_three)
+	var s = 20
+	_create_stone_grid(s, {})
+	var btn = _stone_grid.get_button_at(Vector2(s/2, s/2))
+	btn.stones = s * s
+	#_create_stone_grid(3, three_x_three)
 	#_create_stone_grid(10, ten_x_ten)
 
 func _create_stone_grid(size : int, arrangements : Dictionary):
@@ -102,31 +153,48 @@ func _create_stone_grid(size : int, arrangements : Dictionary):
 	add_child(_stone_grid)
 	_stone_grid.position = Vector2(300, 100)
 	_stone_grid.custom_minimum_size = Vector2(460, 350)
-	
+
 	_stone_grid.set_grid_size(size)
 	_make_populate_buttons(arrangements)
-	_stone_grid.populate(arrangements[arrangements.keys()[0]])
+	if(arrangements.keys().size() > 0):
+		_stone_grid.populate(arrangements[arrangements.keys()[0]])
 
 
 func _make_populate_buttons(arrangements):
 	for child in _ctrls.stone_arrangements.get_children():
 		child.free()
-		
+
 	for key in arrangements:
 		var btn = Button.new()
 		btn.text = key
 		_ctrls.stone_arrangements.add_child(btn)
 		btn.pressed.connect(func():  _stone_grid.populate(arrangements[key]))
-		
+
+var _running = false
+var _start_time = 0.0
+func _update_time():
+	var t = (Time.get_ticks_msec() - _start_time) / 1000.0
+	_ctrls.time.text = str("%.3f" % t, 's')
 	
 
+func _process(delta):
+	if(_running):
+		_update_time()
+		
+
 func solve():
-	_stone_grid.wait_time = $Controls/Layout/Delay.value
-	$Controls.visible = false
+	_stone_grid.save_layout()
+	_start_time = Time.get_ticks_msec()
+	_running = true
+	_stone_grid.wait_time = _ctrls.delay.value
+	_ctrls.buttons_vbox.visible = false
 	var solver = Solvers.ThisOne.new()
 	await solver.solve(_stone_grid)
-	$Controls.visible = true
+	_ctrls.buttons_vbox.visible = true
 	_stone_grid.wait_time = 0
+	_running = false
+	_update_time()
+	print('Time = ', _ctrls.time.text)
 
 
 func _on_solve_pressed():

@@ -1,8 +1,6 @@
 class_name Solvers
 
-
-
-class ThisOne:
+class BaseSolver:
 	var _grid : StoneGrid = null
 
 	func get_surrounding_squares(pos : Vector2):
@@ -20,22 +18,6 @@ class ThisOne:
 			to_return.append(_grid._stone_buttons[pos.x][pos.y - 1])
 
 		return to_return
-
-
-	func solve(grid : StoneGrid):
-		_grid = grid
-		grid.print_board()
-
-		var count = 0
-		var max_attempts = 200
-		while(!_grid.is_solved() and count <= max_attempts):
-			print('===== Pass ', count, ' =====')
-			await attempt()
-			count += 1
-
-		print('Passes    ', count)
-		print('Moves     ', _grid.moves)
-		print('Solved    ', _grid.is_solved())
 
 
 	func get_all_zeros():
@@ -75,15 +57,14 @@ class ThisOne:
 		return furthest
 
 
-	func push_in_direction_of_closest_zero(pos : Vector2):
+	func push_in_direction_of(pos : Vector2, target_button : StoneButton):
 		var here = _grid.get_button_at(pos)
 
 		if(here.stones > 1):
-			var closest_zero = get_closest_zero(pos)
 			var to = null
-			if(closest_zero != null):
-				var xdiff = closest_zero.grid_pos.x - pos.x
-				var ydiff = closest_zero.grid_pos.y - pos.y
+			if(target_button != null):
+				var xdiff = target_button.grid_pos.x - pos.x
+				var ydiff = target_button.grid_pos.y - pos.y
 
 				if(abs(xdiff) > abs(ydiff)):
 					to = _grid.get_button_at(pos + Vector2(sign(xdiff), 0))
@@ -91,27 +72,62 @@ class ThisOne:
 					to = _grid.get_button_at(pos + Vector2(0, sign(ydiff)))
 				await _grid.move_stone(pos, to.grid_pos)
 
+	func _solve():
+		pass
 
-	func push_in_direction_of_furthest_zero(pos : Vector2):
-		var here = _grid.get_button_at(pos)
+	func solve(grid : StoneGrid):
+		_grid = grid
+		grid.print_board()
 
-		if(here.stones > 1):
-			var closest_zero = get_furthest_zero(pos)
-			var to = null
-			if(closest_zero != null):
-				var xdiff = closest_zero.grid_pos.x - pos.x
-				var ydiff = closest_zero.grid_pos.y - pos.y
+		await _solve()
 
-				if(abs(xdiff) > abs(ydiff)):
-					to = _grid.get_button_at(pos + Vector2(sign(xdiff), 0))
-				else:
-					to = _grid.get_button_at(pos + Vector2(0, sign(ydiff)))
-				await _grid.move_stone(pos, to.grid_pos)
+		print('Moves     ', _grid.moves)
+		print('Solved    ', _grid.is_solved())
 
+
+
+class ThisOne:
+	extends BaseSolver
+
+	func _solve():
+
+		var count = 0
+		var max_attempts = 200
+		while(!_grid.is_solved() and count <= max_attempts):
+			print('===== Pass ', count, ' =====')
+			await attempt()
+			count += 1
+
+		print('Passes    ', count)
 
 
 	func attempt():
 		for i in range(_grid.grid_size()):
 			for j in range(_grid.grid_size()):
 				var pos = Vector2(i, j)
-				await push_in_direction_of_closest_zero(pos)
+				var target = get_closest_zero(pos)
+				await push_in_direction_of(pos, target)
+
+
+
+class PushTillWeGetThere:
+	extends BaseSolver
+
+	func _solve():
+
+		var count = 0
+		var max_attempts = 200
+		while(!_grid.is_solved() and count <= max_attempts):
+			print('===== Pass ', count, ' =====')
+			await attempt()
+			count += 1
+
+		print('Passes    ', count)
+
+
+	func attempt():
+		for i in range(_grid.grid_size()):
+			for j in range(_grid.grid_size()):
+				var pos = Vector2(i, j)
+				# while(_grid.get_stones_at(pos))
+				# await push_in_direction_of(pos, get_closest_zero)
