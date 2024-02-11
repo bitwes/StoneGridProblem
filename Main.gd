@@ -140,25 +140,56 @@ var ten_x_ten = {
 	]
 }
 @onready var _ctrls = {
-	buttons_vbox = $Controls/Layout/Buttons,
+	c1_buttons_vbox = $Controls/Layout/Buttons,
+	c2_buttons_vbox = $Controls2/Layout/Buttons,
 	stone_arrangements = $Controls/Layout/Buttons/StoneArrangements,
-	time = $Controls/Layout/Time,
-	delay = $Controls/Layout/Buttons/Delay
+	time = $Controls2/Layout/Time,
+	delay = $Controls2/Layout/Buttons/Delay,
+	orig_stone_grid = $StoneGrid,
+	stop = $Controls2/Layout/Stop
 }
 
 var _stone_grid : StoneGrid = null
 var _running = false
 var _start_time = 0.0
 
-var solver = Solvers.PushTillWeGetThere.new()
+var solver = Solvers.BestIdea.new() : 
+	get: return solver
+	set(val): 
+		solver = val
+		print('solver = ', solver, ' ', solver.get_script(), ' ', solver.get_class())
 
 func _ready():
-	var bg = ButtonGroup.new()
-	for btn in $Controls/Layout/Buttons/Solvers.get_children():
-		btn.button_group = bg
+	_ctrls.orig_stone_grid.visible = false
+	_stone_grid = _ctrls.orig_stone_grid
+	_ctrls.stop.visible = false
 	
-	_create_grid_all_at_center(20)
-	#_create_stone_grid(3, three_x_three)
+	var first = true
+	var bg = ButtonGroup.new()
+	for btn in $Controls2/Layout/Buttons/Solvers.get_children():
+		btn.button_group = bg
+		if(first):
+			btn.button_pressed = true
+			btn.pressed.emit()
+			first = false
+		else: 
+			btn.button_pressed = false
+
+	first = true
+	bg = ButtonGroup.new()
+	for btn in $Controls/Layout/Buttons/Layouts.get_children():
+		btn.toggle_mode = true
+		btn.button_group = bg
+		if(first):
+			btn.button_pressed = true
+			btn.pressed.emit()
+			first = false
+		else: 
+			btn.button_pressed = false
+
+		
+	#_create_grid_all_at_center(20)
+	_create_stone_grid(3, three_x_three)
 	#_create_stone_grid(10, ten_x_ten)
 
 
@@ -169,13 +200,13 @@ func _create_grid_all_at_center(s):
 
 
 func _create_stone_grid(size : int, arrangements : Dictionary):
-	if(_stone_grid != null):
+	if(_stone_grid != null  and _stone_grid != _ctrls.orig_stone_grid):
 		_stone_grid.queue_free()
 
 	_stone_grid = StoneGridScene.instantiate()
 	add_child(_stone_grid)
-	_stone_grid.position = Vector2(300, 10)
-	_stone_grid.custom_minimum_size = Vector2(800, 600)
+	_stone_grid.position = _ctrls.orig_stone_grid.position
+	_stone_grid.size = _ctrls.orig_stone_grid.size
 
 	_stone_grid.set_grid_size(size)
 	_make_populate_buttons(arrangements)
@@ -186,12 +217,23 @@ func _create_stone_grid(size : int, arrangements : Dictionary):
 func _make_populate_buttons(arrangements):
 	for child in _ctrls.stone_arrangements.get_children():
 		child.free()
-
+	
+	var g = ButtonGroup.new()
+	var first = true
 	for key in arrangements:
 		var btn = Button.new()
 		btn.text = key
+		btn.toggle_mode = true
+		btn.button_group = g
 		_ctrls.stone_arrangements.add_child(btn)
 		btn.pressed.connect(func():  _stone_grid.populate(arrangements[key]))
+		if(first):
+			btn.button_pressed = true
+			btn.pressed.emit()
+			first = false
+		else: 
+			btn.button_pressed = false
+
 
 func _update_time():
 	var t = (Time.get_ticks_msec() - _start_time) / 1000.0
@@ -202,17 +244,27 @@ func _process(__delta):
 	if(_running):
 		_update_time()
 
+func _run_mode(is_it):
+	_running = is_it
+	_ctrls.stop.visible = is_it
+	_running = is_it
+	_ctrls.c1_buttons_vbox.visible = !is_it
+	_ctrls.c2_buttons_vbox.visible = !is_it	
 
 func solve():
+	if(_stone_grid.is_solved()):
+		_stone_grid.reset()
 	_stone_grid.save_layout()
-	_start_time = Time.get_ticks_msec()
-	_running = true
 	_stone_grid.wait_time = _ctrls.delay.value
-	_ctrls.buttons_vbox.visible = false
+	set_process(false)
+	_run_mode(true)
+	await get_tree().create_timer(.25).timeout
+	_start_time = Time.get_ticks_msec()
+	set_process(true)
 	await solver.solve(_stone_grid)
-	_ctrls.buttons_vbox.visible = true
+	_run_mode(false)
 	_stone_grid.wait_time = 0
-	_running = false
+
 	_update_time()
 	print('Time = ', _ctrls.time.text)
 
@@ -259,3 +311,11 @@ func _on_this_one_pressed():
 
 func _on_push_until_pressed():
 	solver = Solvers.PushTillWeGetThere.new()
+
+
+func _on_best_idea_pressed():
+	solver = Solvers.BestIdea.new()
+
+
+func _on_stop_pressed():
+	solver.stop()

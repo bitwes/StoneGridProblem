@@ -220,11 +220,12 @@ func _on_print_array_pressed():
 
 
 func save_layout():
-	_last_layout = []
-	for i in range(grid_size()):
-		_last_layout.append([])
-		for j in range(grid_size()):
-			_last_layout[i].append(_stone_buttons[i][j].stones)
-			
-	
+	if(!is_solved()):
+		_last_layout = []
+		for i in range(grid_size()):
+			_last_layout.append([])
+			for j in range(grid_size()):
+				_last_layout[i].append(_stone_buttons[i][j].stones)
+
+
 

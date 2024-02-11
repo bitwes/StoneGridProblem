@@ -2,6 +2,7 @@ class_name Solvers
 
 class BaseSolver:
 	var _grid : StoneGrid = null
+	var _should_run = true
 
 	func get_surrounding_squares(pos : Vector2):
 		var to_return = []
@@ -93,12 +94,30 @@ class BaseSolver:
 		return xdiff + ydiff
 
 
+	func push_all_towards(pos : Vector2, target : StoneButton):
+		if(target == null):
+			return
+
+		var moved = 0
+		var here = _grid.get_button_at(pos)
+		var to = get_button_in_direction(pos, target)
+		if(to != null):
+			var dist = calc_moves_to(here, to)
+
+			while(moved < int(dist) and here.stones > 1):
+				await _grid.move_stone(pos, to.grid_pos)
+				moved += 1
+
+			if(moved > 0 and to != null):
+				await push_all_towards(to.grid_pos, target)
+
 
 
 	func _solve():
 		pass
 
 	func solve(grid : StoneGrid):
+		_should_run = true
 		_grid = grid
 		grid.print_board()
 
@@ -107,6 +126,8 @@ class BaseSolver:
 		print('Moves     ', _grid.moves)
 		print('Solved    ', _grid.is_solved())
 
+	func stop():
+		_should_run = false
 
 
 class ThisOne:
@@ -117,6 +138,8 @@ class ThisOne:
 		var count = 0
 		var max_attempts = 200
 		while(!_grid.is_solved() and count <= max_attempts):
+			if(!_should_run):
+					return
 			print('===== Pass ', count, ' =====')
 			await attempt()
 			count += 1
@@ -137,34 +160,16 @@ class PushTillWeGetThere:
 	extends BaseSolver
 
 	func _solve():
-
 		var count = 0
 		var max_attempts = _grid.grid_size() * _grid.grid_size()
 		while(!_grid.is_solved() and count <= max_attempts):
+			if(!_should_run):
+				return
 			print('===== Pass ', count, ' =====')
 			await attempt()
 			count += 1
 
 		print('Passes    ', count)
-
-
-	func push_all_towards(pos, target):
-		if(target == null):
-			return
-
-		var moved = 0
-		var here = _grid.get_button_at(pos)
-		var to = get_button_in_direction(pos, target)
-		if(to != null):
-			var dist = calc_moves_to(here, to)
-
-			while(moved < int(dist) and here.stones > 1):
-				await _grid.move_stone(pos, to.grid_pos)
-				moved += 1
-
-			if(moved > 0 and to != null):
-				await push_all_towards(to.grid_pos, target)
-
 
 
 	func attempt():
@@ -179,3 +184,85 @@ class PushTillWeGetThere:
 					await push_all_towards(pos, target)
 					target.set_color(Color(0, 0, 0, 0))
 				here.set_color(Color(0, 0, 0, 0))
+
+class BestIdea:
+	extends BaseSolver
+
+	func _get_buttons_with_spreadable_stones():
+		var btns = []
+		for i in range(_grid.grid_size()):
+			for j in range(_grid.grid_size()):
+				var btn = _grid.get_button_at(Vector2(i, j))
+				if(btn.stones > 1):
+					btns.append(btn)
+		return btns
+
+
+	func get_zero_btn_in_diretion(from_pos, dir):
+		var here = from_pos
+		var found = false
+		here += dir
+		while(!found and here.x >= 0 and here.x < _grid.grid_size() and here.y >= 0 and here.y < _grid.grid_size()):
+			var btn = _grid.get_button_at(here)
+			print('   ', btn)
+			found = btn.stones == 0
+			if(!found):
+				here += dir
+
+		var zero_btn = null
+		if(found):
+			zero_btn = _grid.get_button_at(here)
+		print('   r = ', zero_btn)
+		return zero_btn
+
+
+	func _spread_stones(b):
+		for x in range(-1.0, 2.0, .1):
+			for y in range(-1.0, 2.0, .1):
+				if(x != 0 or y != 0):
+					print(x, ',', y)
+					var zero_btn = get_zero_btn_in_diretion(b.grid_pos, Vector2(x, y))
+					if(zero_btn != null):
+						await push_all_towards(b.grid_pos, zero_btn)
+
+	func _get_closest_zero_in_range(from : StoneButton, r):
+		var target = get_closest_zero(from.grid_pos)
+		if(target != null and calc_moves_to(from, target) <= r):
+			return target
+		else:
+			return null
+
+	func attempt(here, r):
+		var target = _get_closest_zero_in_range(here, r)
+		here.set_color(Color(1, 1, 1, .5))
+		while(target != null and here.stones > 1):
+			if(!_should_run):
+				return
+			target.set_color(Color(0, 0, 1, .5))
+			await push_all_towards(here.grid_pos, target)
+			target.set_color(Color(0, 0, 0, 0))
+			target = _get_closest_zero_in_range(here, r)
+		here.set_color(Color(0, 0, 0, 0))
+
+
+	func _solve():
+		var count = 0
+		var max_attempts = _grid.grid_size() * _grid.grid_size()
+		var spreadable = _get_buttons_with_spreadable_stones()
+		spreadable.sort_custom(func(a, b):
+			return a.stones > b.stones)
+		print(spreadable)
+
+		var r = 1
+		while(!_grid.is_solved() and count <= max_attempts):
+			print('===== Pass ', count, ' =====')
+			for s in spreadable:
+				if(!_should_run):
+					return
+				print(s, '::', r)
+				await attempt(s, r)
+			r += 1
+
+			count += 1
+
+		print('Passes    ', count)
