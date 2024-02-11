@@ -16,6 +16,7 @@ var moves = 0 :
 		moves = val
 		_ctrls.moves_label.text = str('Moves: ', val)
 
+
 @onready var _ctrls = {
 	grid = $Layout/Grid,
 	moves_label = $Layout/Header/Moves
@@ -37,8 +38,6 @@ func _animate_move(from_btn : StoneButton, to_btn : StoneButton, duration : floa
 	t.tween_property(lbl, 'global_position', to_btn.global_position, duration)
 	t.play()
 	return t
-
-
 
 
 func _on_stone_button_toggled(which : StoneButton):
@@ -68,7 +67,8 @@ func move_stone(from : Vector2, to : Vector2):
 			from_btn.modulate = Color(0, 1, 0)
 			to_btn.modulate = Color(0, 1, 0)
 		from_btn .stones -= 1
-		await _animate_move(from_btn, to_btn, wait_time).finished
+		if(wait_time > 0.0):
+			await _animate_move(from_btn, to_btn, wait_time).finished
 		to_btn.stones += 1
 		moves += 1
 		_undo.append([from, to])
@@ -98,13 +98,12 @@ func undo():
 
 func create_map(w, h):
 	var map = []
-
 	for x in range(w):
 		var col = []
 		col.resize(h)
 		map.append(col)
-
 	return map
+
 
 func set_grid_size(s):
 	_stone_buttons = create_map(s, s)
@@ -121,6 +120,7 @@ func set_grid_size(s):
 			r.add_child(b)
 			_stone_buttons[i][j] = b
 
+
 func populate(stones):
 	_last_layout = stones
 	moves = 0
@@ -128,14 +128,16 @@ func populate(stones):
 		for j in stones[i].size():
 			_stone_buttons[i][j].stones = stones[i][j]
 
+
 func reset():
 	if(_last_layout != null):
 		populate(_last_layout)
 		moves = 0
 
 
-func size():
+func grid_size():
 	return _stone_buttons.size()
+
 
 func _on_undo_pressed():
 	undo()
@@ -147,9 +149,9 @@ func _on_reset_pressed():
 
 func print_board():
 	print("".lpad(10, '-'))
-	for i in range(size()):
+	for i in range(grid_size()):
 		var rowstr = '|'
-		for j in range(size()):
+		for j in range(grid_size()):
 			rowstr += str(get_stones_at(Vector2(i, j)), '|').lpad(3, ' ')
 		print(rowstr)
 	print("".lpad(10, '-'))
@@ -161,8 +163,8 @@ func get_button_at(pos : Vector2):
 
 func get_num_wrong():
 	var num_wrong = 0
-	for i in range(size()):
-		for j in range(size()):
+	for i in range(grid_size()):
+		for j in range(grid_size()):
 			if(_stone_buttons[i][j].stones > 1):
 				num_wrong += 1
 	return num_wrong

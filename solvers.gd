@@ -7,13 +7,13 @@ class ThisOne:
 
 	func get_surrounding_squares(pos : Vector2):
 		var to_return = []
-		if(pos.x + 1 < _grid.size()):
+		if(pos.x + 1 < _grid.grid_size()):
 			to_return.append(_grid._stone_buttons[pos.x + 1][pos.y])
 
 		if(pos.x -1 >=0):
 			to_return.append(_grid._stone_buttons[pos.x - 1][pos.y])
 
-		if(pos.y + 1 < _grid.size()):
+		if(pos.y + 1 < _grid.grid_size()):
 			to_return.append(_grid._stone_buttons[pos.x][pos.y + 1])
 
 		if(pos.y - 1 >= 0):
@@ -40,8 +40,8 @@ class ThisOne:
 
 	func get_all_zeros():
 		var to_return = []
-		for i in range(_grid.size()):
-			for j in range(_grid.size()):
+		for i in range(_grid.grid_size()):
+			for j in range(_grid.grid_size()):
 				var pos = Vector2(i, j)
 				var btn = _grid.get_button_at(pos)
 				if(btn.stones == 0):
@@ -111,7 +111,7 @@ class ThisOne:
 
 
 	func attempt():
-		for i in range(_grid.size()):
-			for j in range(_grid.size()):
+		for i in range(_grid.grid_size()):
+			for j in range(_grid.grid_size()):
 				var pos = Vector2(i, j)
 				await push_in_direction_of_closest_zero(pos)
