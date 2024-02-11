@@ -39,6 +39,17 @@ var three_x_three = {
 		[0, 2, 0],
 		[0, 0, 5]
 	],
+	tl = [
+		[9, 0, 0],
+		[0, 0, 0],
+		[0, 0, 0]
+	],
+	br = [
+		[0, 0, 0],
+		[0, 0, 0],
+		[0, 0, 9]
+	],
+
 }
 
 
@@ -136,14 +147,26 @@ var ten_x_ten = {
 }
 
 var _stone_grid : StoneGrid = null
+var _running = false
+var _start_time = 0.0
+
+var solver = Solvers.PushTillWeGetThere.new()
 
 func _ready():
-	var s = 20
+	var bg = ButtonGroup.new()
+	for btn in $Controls/Layout/Buttons/Solvers.get_children():
+		btn.button_group = bg
+	
+	_create_grid_all_at_center(20)
+	#_create_stone_grid(3, three_x_three)
+	#_create_stone_grid(10, ten_x_ten)
+
+
+func _create_grid_all_at_center(s):
 	_create_stone_grid(s, {})
 	var btn = _stone_grid.get_button_at(Vector2(s/2, s/2))
 	btn.stones = s * s
-	#_create_stone_grid(3, three_x_three)
-	#_create_stone_grid(10, ten_x_ten)
+
 
 func _create_stone_grid(size : int, arrangements : Dictionary):
 	if(_stone_grid != null):
@@ -151,8 +174,8 @@ func _create_stone_grid(size : int, arrangements : Dictionary):
 
 	_stone_grid = StoneGridScene.instantiate()
 	add_child(_stone_grid)
-	_stone_grid.position = Vector2(300, 100)
-	_stone_grid.custom_minimum_size = Vector2(460, 350)
+	_stone_grid.position = Vector2(300, 10)
+	_stone_grid.custom_minimum_size = Vector2(800, 600)
 
 	_stone_grid.set_grid_size(size)
 	_make_populate_buttons(arrangements)
@@ -170,17 +193,15 @@ func _make_populate_buttons(arrangements):
 		_ctrls.stone_arrangements.add_child(btn)
 		btn.pressed.connect(func():  _stone_grid.populate(arrangements[key]))
 
-var _running = false
-var _start_time = 0.0
 func _update_time():
 	var t = (Time.get_ticks_msec() - _start_time) / 1000.0
 	_ctrls.time.text = str("%.3f" % t, 's')
-	
 
-func _process(delta):
+
+func _process(__delta):
 	if(_running):
 		_update_time()
-		
+
 
 func solve():
 	_stone_grid.save_layout()
@@ -188,7 +209,6 @@ func solve():
 	_running = true
 	_stone_grid.wait_time = _ctrls.delay.value
 	_ctrls.buttons_vbox.visible = false
-	var solver = Solvers.ThisOne.new()
 	await solver.solve(_stone_grid)
 	_ctrls.buttons_vbox.visible = true
 	_stone_grid.wait_time = 0
@@ -231,3 +251,11 @@ func _on_ten_x_ten_pressed():
 
 func _on_reset_pressed():
 	_stone_grid.reset()
+
+
+func _on_this_one_pressed():
+	solver = Solvers.ThisOne.new()
+
+
+func _on_push_until_pressed():
+	solver = Solvers.PushTillWeGetThere.new()

@@ -5,7 +5,7 @@ var grid_pos = Vector2(-1, -1)
 
 var edit_mode = false :
 	get: return edit_mode
-	set(val): 
+	set(val):
 		edit_mode = val
 		toggle_mode = !edit_mode
 
@@ -14,7 +14,7 @@ var stones = 0 :
 	set(val):
 		if(val >= 0):
 			stones = val
-			
+
 		if(stones > 0):
 			text = str(stones)
 		else:
@@ -41,3 +41,6 @@ func _ready():
 
 func _to_string():
 	return str(grid_pos, '[', stones, ']')
+
+func set_color(c):
+	$ColorRect.color = c
