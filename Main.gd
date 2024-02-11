@@ -10,6 +10,7 @@ extends Node2D
 # Return the minimum number of moves required to place one stone in each cell.
 # ------------------------------------------------------------------------------
 
+var StoneGridScene = load("res://stone_grid.tscn")
 
 var three_x_three = {
 
@@ -83,23 +84,48 @@ var ten_x_ten = {
 		[0, 0, 0, 0, 0, 0, 0, 0, 10, 0],
 	]
 }
+@onready var _ctrls = {
+	stone_arrangements = $Controls/Layout/StoneArrangements
+}
 
+var _stone_grid : StoneGrid = null
 
 func _ready():
-	$StoneGrid.set_grid_size(10)
-	$StoneGrid.populate(ten_x_ten.various_tens)
+	_create_stone_grid(3, three_x_three)
+	#_create_stone_grid(10, ten_x_ten)
 
-	#$StoneGrid.set_grid_size(3)
-	#$StoneGrid.populate(three_x_three.harder)
+func _create_stone_grid(size, arrangements):
+	if(_stone_grid != null):
+		_stone_grid.queue_free()
 
+	_stone_grid = StoneGridScene.instantiate()
+	add_child(_stone_grid)
+	_stone_grid.position = Vector2(300, 100)
+	_stone_grid.custom_minimum_size = Vector2(460, 350)
+	
+	_stone_grid.set_grid_size(size)
+	_make_populate_buttons(arrangements)
+
+
+func _make_populate_buttons(arrangements):
+	for child in _ctrls.stone_arrangements.get_children():
+		child.free()
+		
+	for key in arrangements:
+		var btn = Button.new()
+		btn.text = key
+		_ctrls.stone_arrangements.add_child(btn)
+		btn.pressed.connect(func():  _stone_grid.populate(arrangements[key]))
+		
+	
 
 func solve():
-	$StoneGrid.wait_time = $Controls/Layout/Delay.value
+	_stone_grid.wait_time = $Controls/Layout/Delay.value
 	$Controls.visible = false
 	var solver = Solvers.ThisOne.new()
-	await solver.solve($StoneGrid)
+	await solver.solve(_stone_grid)
 	$Controls.visible = true
-	$StoneGrid.wait_time = 0
+	_stone_grid.wait_time = 0
 
 
 func _on_solve_pressed():
@@ -107,20 +133,28 @@ func _on_solve_pressed():
 
 
 func _on_diag_threes_pressed():
-	$StoneGrid.populate(three_x_three.diag_three)
+	_stone_grid.populate(three_x_three.diag_three)
 
 
 func _on_center_nine_pressed():
-	$StoneGrid.populate(three_x_three.nine_center)
+	_stone_grid.populate(three_x_three.nine_center)
 
 
 func _on_center_line_three_pressed():
-	$StoneGrid.populate(three_x_three.three_center_line)
+	_stone_grid.populate(three_x_three.three_center_line)
 
 
 func _on_harder_pressed():
-	$StoneGrid.populate(three_x_three.harder)
+	_stone_grid.populate(three_x_three.harder)
 
 
 func _on_harder_inverse_pressed():
-	$StoneGrid.populate(three_x_three.harder_inverse)
+	_stone_grid.populate(three_x_three.harder_inverse)
+
+
+func _on_three_x_three_pressed():
+	_create_stone_grid(3, three_x_three)
+
+
+func _on_ten_x_ten_pressed():
+	_create_stone_grid(10, ten_x_ten)
