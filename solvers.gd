@@ -62,6 +62,19 @@ class ThisOne:
 		return closest
 
 
+	func get_furthest_zero(pos):
+		var zeros = get_all_zeros()
+		var furthest = null
+		if(zeros.size() > 0):
+			var max_dist = 0
+			for z in zeros:
+				var dist = pos.distance_to(z.grid_pos)
+				if(dist > max_dist):
+					furthest = z
+					max_dist = dist
+		return furthest
+
+
 	func push_in_direction_of_closest_zero(pos : Vector2):
 		var here = _grid.get_button_at(pos)
 
@@ -77,6 +90,24 @@ class ThisOne:
 				else:
 					to = _grid.get_button_at(pos + Vector2(0, sign(ydiff)))
 				await _grid.move_stone(pos, to.grid_pos)
+
+
+	func push_in_direction_of_furthest_zero(pos : Vector2):
+		var here = _grid.get_button_at(pos)
+
+		if(here.stones > 1):
+			var closest_zero = get_furthest_zero(pos)
+			var to = null
+			if(closest_zero != null):
+				var xdiff = closest_zero.grid_pos.x - pos.x
+				var ydiff = closest_zero.grid_pos.y - pos.y
+
+				if(abs(xdiff) > abs(ydiff)):
+					to = _grid.get_button_at(pos + Vector2(sign(xdiff), 0))
+				else:
+					to = _grid.get_button_at(pos + Vector2(0, sign(ydiff)))
+				await _grid.move_stone(pos, to.grid_pos)
+
 
 
 	func attempt():

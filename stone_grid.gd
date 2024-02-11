@@ -1,7 +1,6 @@
 class_name StoneGrid
 extends Control
 
-
 var StoneButtonScene = load('res://stone_button.tscn')
 
 var _from : StoneButton = null
@@ -21,6 +20,26 @@ var moves = 0 :
 	grid = $Layout/Grid,
 	moves_label = $Layout/Header/Moves
 }
+
+
+func _animate_move(from_btn : StoneButton, to_btn : StoneButton, duration : float):
+	var lbl = Label.new()
+	$TopLayer.add_child(lbl)
+	lbl.global_position = from_btn.global_position
+	lbl.size = from_btn.size
+	lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	lbl.text = '1'
+	lbl.modulate = Color(0, 1, 0)
+
+	var t = from_btn.create_tween()
+	t.finished.connect(func ():  lbl.queue_free())
+	t.tween_property(lbl, 'global_position', to_btn.global_position, duration)
+	t.play()
+	return t
+
+
+
 
 func _on_stone_button_toggled(which : StoneButton):
 	if(_from == which):
@@ -46,15 +65,15 @@ func move_stone(from : Vector2, to : Vector2):
 	if(from_btn != to_btn and from.distance_to(to) == 1.0 and from_btn.stones > 0):
 		print(from_btn, ' -> ', to_btn)
 		if(wait_time > 0):
-			from_btn.modulate = Color(1, 0, 0)
+			from_btn.modulate = Color(0, 1, 0)
 			to_btn.modulate = Color(0, 1, 0)
 		from_btn .stones -= 1
+		await _animate_move(from_btn, to_btn, wait_time).finished
 		to_btn.stones += 1
 		moves += 1
 		_undo.append([from, to])
 		print_board()
 		if(wait_time > 0):
-			await get_tree().create_timer(wait_time).timeout
 			from_btn.modulate = Color(1, 1, 1)
 			to_btn.modulate = Color(1, 1, 1)
 
@@ -135,6 +154,7 @@ func print_board():
 		print(rowstr)
 	print("".lpad(10, '-'))
 
+
 func get_button_at(pos : Vector2):
 	return _stone_buttons[pos.x][pos.y]
 
@@ -146,7 +166,7 @@ func get_num_wrong():
 			if(_stone_buttons[i][j].stones > 1):
 				num_wrong += 1
 	return num_wrong
-	
+
 
 func is_solved():
-	return get_num_wrong() == 0	
+	return get_num_wrong() == 0

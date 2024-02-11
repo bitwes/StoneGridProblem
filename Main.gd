@@ -94,7 +94,7 @@ func _ready():
 	_create_stone_grid(3, three_x_three)
 	#_create_stone_grid(10, ten_x_ten)
 
-func _create_stone_grid(size, arrangements):
+func _create_stone_grid(size : int, arrangements : Dictionary):
 	if(_stone_grid != null):
 		_stone_grid.queue_free()
 
@@ -105,6 +105,7 @@ func _create_stone_grid(size, arrangements):
 	
 	_stone_grid.set_grid_size(size)
 	_make_populate_buttons(arrangements)
+	_stone_grid.populate(arrangements[arrangements.keys()[0]])
 
 
 func _make_populate_buttons(arrangements):
@@ -158,3 +159,7 @@ func _on_three_x_three_pressed():
 
 func _on_ten_x_ten_pressed():
 	_create_stone_grid(10, ten_x_ten)
+
+
+func _on_reset_pressed():
+	_stone_grid.reset()

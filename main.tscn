@@ -49,6 +49,16 @@ value = 0.05
 layout_mode = 2
 text = "Solve"
 
+[node name="Reset" type="Button" parent="Controls/Layout"]
+layout_mode = 2
+text = "Reset"
+
+[node name="Label" type="Label" parent="Controls"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
+
 [connection signal="pressed" from="Controls/Layout/ThreeXThree" to="." method="_on_three_x_three_pressed"]
 [connection signal="pressed" from="Controls/Layout/TenXTen" to="." method="_on_ten_x_ten_pressed"]
 [connection signal="pressed" from="Controls/Layout/Solve" to="." method="_on_solve_pressed"]
+[connection signal="pressed" from="Controls/Layout/Reset" to="." method="_on_reset_pressed"]

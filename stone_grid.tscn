@@ -49,5 +49,7 @@ text = "Reset"
 layout_mode = 2
 size_flags_vertical = 3
 
+[node name="TopLayer" type="Node2D" parent="."]
+
 [connection signal="pressed" from="Layout/Header/Undo" to="." method="_on_undo_pressed"]
 [connection signal="pressed" from="Layout/Header/Reset" to="." method="_on_reset_pressed"]
