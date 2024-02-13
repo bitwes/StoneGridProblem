@@ -2,6 +2,23 @@ class_name StoneButton
 extends Button
 
 var grid_pos = Vector2(-1, -1)
+var edit_increment = 1
+var increment_repeat = .25
+var _waited = 0.0
+var _repeat = false
+
+var _change_count = 0
+var _check_count = 0
+
+signal stones_changed
+
+func _process(delta):
+	if(_repeat):
+		_waited += delta
+		if(_waited > increment_repeat):
+			stones += edit_increment
+			_waited = 0.0
+
 
 var edit_mode = false :
 	get: return edit_mode
@@ -10,10 +27,14 @@ var edit_mode = false :
 		toggle_mode = !edit_mode
 
 var stones = 0 :
-	get: return stones
+	get:
+		_check_count += 1 
+		return stones
 	set(val):
+		_change_count += 1
 		if(val >= 0):
 			stones = val
+			stones_changed.emit()
 
 		if(stones > 0):
 			text = str(stones)
@@ -28,12 +49,9 @@ func _init():
 func _gui_input(event):
 	if(edit_mode):
 		if(event is InputEventMouseButton):
+			_repeat = event.pressed
 			if(event.pressed):
-				if(event.button_index == MOUSE_BUTTON_LEFT):
-					stones += 1
-				elif(event.button_index == MOUSE_BUTTON_RIGHT):
-					stones -= 1
-					pressed.emit()
+				stones += edit_increment
 
 func _ready():
 	if(stones == -1):
@@ -44,3 +62,19 @@ func _to_string():
 
 func set_color(c):
 	$ColorRect.color = c
+
+func reset_counts():
+	_change_count = 0
+	_check_count = 0
+	
+func show_change_count():
+	#text = " "
+	$ColorRect/Label.text = str(_change_count)
+
+func show_check_count():
+	#text = " "
+	$ColorRect/Label.text = str(_check_count)
+	
+func show_stones():
+	text = str(stones)
+	$ColorRect/Label.text = ""

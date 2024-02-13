@@ -50,13 +50,28 @@ text = "Undo"
 layout_mode = 2
 text = "Reset"
 
-[node name="EditMode" type="CheckButton" parent="Layout/Header"]
-layout_mode = 2
-text = "Edit"
-
 [node name="PrintArray" type="Button" parent="Layout/Header"]
 layout_mode = 2
 text = "Print"
+
+[node name="Header2" type="HBoxContainer" parent="Layout"]
+layout_mode = 2
+
+[node name="EditMode" type="CheckButton" parent="Layout/Header2"]
+layout_mode = 2
+text = "Edit"
+
+[node name="EditButtons" type="HBoxContainer" parent="Layout/Header2"]
+layout_mode = 2
+
+[node name="Plus" type="CheckButton" parent="Layout/Header2/EditButtons"]
+layout_mode = 2
+button_pressed = true
+text = " + "
+
+[node name="Clear" type="Button" parent="Layout/Header2/EditButtons"]
+layout_mode = 2
+text = "Clear"
 
 [node name="Scroll" type="ScrollContainer" parent="Layout"]
 layout_mode = 2
@@ -73,5 +88,7 @@ size_flags_vertical = 3
 
 [connection signal="pressed" from="Layout/Header/Undo" to="." method="_on_undo_pressed"]
 [connection signal="pressed" from="Layout/Header/Reset" to="." method="_on_reset_pressed"]
-[connection signal="pressed" from="Layout/Header/EditMode" to="." method="_on_edit_mode_pressed"]
 [connection signal="pressed" from="Layout/Header/PrintArray" to="." method="_on_print_array_pressed"]
+[connection signal="pressed" from="Layout/Header2/EditMode" to="." method="_on_edit_mode_pressed"]
+[connection signal="pressed" from="Layout/Header2/EditButtons/Plus" to="." method="_on_plus_pressed"]
+[connection signal="pressed" from="Layout/Header2/EditButtons/Clear" to="." method="_on_clear_pressed"]

@@ -225,12 +225,14 @@ class BestIdea:
 					if(zero_btn != null):
 						await push_all_towards(b.grid_pos, zero_btn)
 
+
 	func _get_closest_zero_in_range(from : StoneButton, r):
 		var target = get_closest_zero(from.grid_pos)
 		if(target != null and calc_moves_to(from, target) <= r):
 			return target
 		else:
 			return null
+
 
 	func attempt(here, r):
 		var target = _get_closest_zero_in_range(here, r)

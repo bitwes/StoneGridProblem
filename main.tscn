@@ -125,6 +125,12 @@ text = "Solve"
 layout_mode = 2
 text = "Reset"
 
+[node name="UndoSlider" type="HSlider" parent="."]
+offset_left = 216.0
+offset_top = 592.0
+offset_right = 920.0
+offset_bottom = 614.0
+
 [connection signal="pressed" from="Controls/Layout/Buttons/Layouts/ThreeXThree" to="." method="_on_three_x_three_pressed"]
 [connection signal="pressed" from="Controls/Layout/Buttons/Layouts/TenXTen" to="." method="_on_ten_x_ten_pressed"]
 [connection signal="pressed" from="Controls2/Layout/Stop" to="." method="_on_stop_pressed"]
@@ -133,3 +139,5 @@ text = "Reset"
 [connection signal="pressed" from="Controls2/Layout/Buttons/Solvers/BestIdea" to="." method="_on_best_idea_pressed"]
 [connection signal="pressed" from="Controls2/Layout/Buttons/Solve" to="." method="_on_solve_pressed"]
 [connection signal="pressed" from="Controls2/Layout/Buttons/Reset" to="." method="_on_reset_pressed"]
+[connection signal="drag_ended" from="UndoSlider" to="." method="_on_undo_slider_drag_ended"]
+[connection signal="value_changed" from="UndoSlider" to="." method="_on_undo_slider_value_changed"]
