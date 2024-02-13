@@ -279,7 +279,7 @@ class BestIdea:
 		var max_attempts = _grid.grid_size() * _grid.grid_size()
 		var spreadable = _get_buttons_with_spreadable_stones()
 
-		# Move piles that have the least amount of stones first.
+		# Move piles that have the most amount of stones first.
 		spreadable.sort_custom(func(a, b):
 			return a.stones > b.stones)
 
