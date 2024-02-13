@@ -4,6 +4,15 @@ class BaseSolver:
 	var _grid : StoneGrid = null
 	var _should_run = true
 
+	var colors = [
+		Color(1, 0, 0), Color(0, 1, 0), Color(0, 0, 1),
+		Color(1, .5, .5), Color(.5, 1, .5), Color(.5, .5, 1),
+		Color(1, 0, 1), Color(1, 1, 0), Color(0, 1, 1),
+		Color(1, .5, 1), Color(1, 1, .5), Color(.5, 1, 1),
+		Color(.5, 0, .5), Color(.5, .5, 0), Color(0, .5, .5),
+		]
+
+
 	func get_surrounding_squares(pos : Vector2):
 		var to_return = []
 		if(pos.x + 1 < _grid.grid_size()):
@@ -73,6 +82,7 @@ class BaseSolver:
 				await _grid.move_stone(pos, to.grid_pos)
 		return to
 
+
 	func get_button_in_direction(pos : Vector2, target_button : StoneButton):
 		var here = _grid.get_button_at(pos)
 		var to = null
@@ -94,23 +104,42 @@ class BaseSolver:
 		return xdiff + ydiff
 
 
-	func push_all_towards(pos : Vector2, target : StoneButton):
+	func push_all_towards(pos : Vector2, target : StoneButton, c = null):
 		if(target == null):
 			return
 
 		var moved = 0
 		var here = _grid.get_button_at(pos)
+		if(c == null):
+			c = here.get_bg_color()
 		var to = get_button_in_direction(pos, target)
 		if(to != null):
 			var dist = calc_moves_to(here, to)
+			if(to.stones == 0):
+				to.set_bg_color(c)
 
 			while(moved < int(dist) and here.stones > 1):
 				await _grid.move_stone(pos, to.grid_pos)
 				moved += 1
 
 			if(moved > 0 and to != null):
-				await push_all_towards(to.grid_pos, target)
+				await push_all_towards(to.grid_pos, target, c)
 
+
+	func _get_buttons_with_spreadable_stones():
+		var cur_color_idx = 0
+
+		var btns = []
+		for i in range(_grid.grid_size()):
+			for j in range(_grid.grid_size()):
+				var btn = _grid.get_button_at(Vector2(i, j))
+				if(btn.stones > 1):
+					btns.append(btn)
+					btn.set_bg_color(colors[cur_color_idx])
+					cur_color_idx += 1
+					if(cur_color_idx > colors.size() -1):
+						cur_color_idx = 0
+		return btns
 
 
 	func _solve():
@@ -124,12 +153,15 @@ class BaseSolver:
 		await _solve()
 
 		print('Moves     ', _grid.moves)
+		print('Checks    ', _grid.get_check_count())
 		print('Solved    ', _grid.is_solved())
 
 	func stop():
 		_should_run = false
 
 
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class ThisOne:
 	extends BaseSolver
 
@@ -155,11 +187,13 @@ class ThisOne:
 				await push_in_direction_of(pos, target)
 
 
-
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class PushTillWeGetThere:
 	extends BaseSolver
 
 	func _solve():
+		_get_buttons_with_spreadable_stones()
 		var count = 0
 		var max_attempts = _grid.grid_size() * _grid.grid_size()
 		while(!_grid.is_solved() and count <= max_attempts):
@@ -185,17 +219,11 @@ class PushTillWeGetThere:
 					target.set_color(Color(0, 0, 0, 0))
 				here.set_color(Color(0, 0, 0, 0))
 
+
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class BestIdea:
 	extends BaseSolver
-
-	func _get_buttons_with_spreadable_stones():
-		var btns = []
-		for i in range(_grid.grid_size()):
-			for j in range(_grid.grid_size()):
-				var btn = _grid.get_button_at(Vector2(i, j))
-				if(btn.stones > 1):
-					btns.append(btn)
-		return btns
 
 
 	func get_zero_btn_in_diretion(from_pos, dir):
@@ -220,7 +248,6 @@ class BestIdea:
 		for x in range(-1.0, 2.0, .1):
 			for y in range(-1.0, 2.0, .1):
 				if(x != 0 or y != 0):
-					print(x, ',', y)
 					var zero_btn = get_zero_btn_in_diretion(b.grid_pos, Vector2(x, y))
 					if(zero_btn != null):
 						await push_all_towards(b.grid_pos, zero_btn)
@@ -251,9 +278,10 @@ class BestIdea:
 		var count = 0
 		var max_attempts = _grid.grid_size() * _grid.grid_size()
 		var spreadable = _get_buttons_with_spreadable_stones()
+
+		# Move piles that have the least amount of stones first.
 		spreadable.sort_custom(func(a, b):
 			return a.stones > b.stones)
-		print(spreadable)
 
 		var r = 1
 		while(!_grid.is_solved() and count <= max_attempts):

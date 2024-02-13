@@ -62,8 +62,6 @@ var _last_layout = null
 
 var wait_time = 0
 
-var wait_time = 0
-
 var moves = 0 :
 	get: return moves
 	set(val):
@@ -239,6 +237,7 @@ func set_grid_size(s):
 			b.custom_minimum_size = Vector2(20, 20)
 			r.add_child(b)
 			b.stones_changed.connect(_on_stones_changed)
+
 			_stone_buttons[i][j] = b
 
 
@@ -248,6 +247,7 @@ func populate(stones):
 	for i in stones.size():
 		for j in stones[i].size():
 			_stone_buttons[i][j].stones = stones[i][j]
+			_stone_buttons[i][j].set_bg_color(Color(0, 0, 0))
 	_update_count()
 
 
@@ -320,3 +320,10 @@ func show_change_counts():
 
 func reset_counts():
 	call_on_buttons(func(btn): btn.reset_counts())
+
+func get_check_count():
+	var val = 0
+	for i in range(grid_size()):
+		for j in range(grid_size()):
+			val += _stone_buttons[i][j]._check_count
+	return val

@@ -3,6 +3,7 @@
 [ext_resource type="Script" path="res://stone_button.gd" id="1_77fbw"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_kstmi"]
+resource_local_to_scene = true
 bg_color = Color(0.0823529, 0.0823529, 0.0823529, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mvq26"]

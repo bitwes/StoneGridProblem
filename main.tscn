@@ -104,12 +104,14 @@ text = "Best Idea"
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="StoneArrangements" type="VBoxContainer" parent="Controls2/Layout/Buttons"]
+[node name="Stats" type="VBoxContainer" parent="Controls2/Layout/Buttons"]
 layout_mode = 2
 
-[node name="Spacer" type="CenterContainer" parent="Controls2/Layout/Buttons"]
+[node name="Moves" type="Label" parent="Controls2/Layout/Buttons/Stats"]
 layout_mode = 2
-size_flags_vertical = 3
+
+[node name="Checks" type="Label" parent="Controls2/Layout/Buttons/Stats"]
+layout_mode = 2
 
 [node name="Delay" type="SpinBox" parent="Controls2/Layout/Buttons"]
 layout_mode = 2

@@ -148,8 +148,10 @@ var ten_x_ten = {
 	delay = $Controls2/Layout/Buttons/Delay,
 	orig_stone_grid = $StoneGrid,
 	stop = $Controls2/Layout/Stop,
+	moves = $Controls2/Layout/Buttons/Stats/Moves,
+	checks = $Controls2/Layout/Buttons/Stats/Checks,
 
-	undo_slider = $UndoSlider
+	undo_slider = $UndoSlider,
 }
 
 var _stone_grid : StoneGrid = null
@@ -191,9 +193,9 @@ func _ready():
 			btn.button_pressed = false
 
 
-	_create_grid_all_at_center(20)
+	#_create_grid_all_at_center(20)
 	#_create_stone_grid(3, three_x_three)
-	#_create_stone_grid(10, ten_x_ten)
+	_create_stone_grid(10, ten_x_ten)
 
 
 func _create_grid_all_at_center(s):
@@ -274,6 +276,8 @@ func solve():
 	_ctrls.undo_slider.value = _stone_grid.undoer.size() -1
 	_update_time()
 	print('Time = ', _ctrls.time.text)
+	_ctrls.moves.text = str('Moves:  ', _stone_grid.moves)
+	_ctrls.checks.text = str('Checks:  ', _stone_grid.get_check_count())
 	#_stone_grid.show_change_counts()
 
 
