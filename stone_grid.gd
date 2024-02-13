@@ -9,17 +9,17 @@ class Undo:
 
 	func _init(stone_grid):
 		_stone_grid = stone_grid
-	
-	
+
+
 	func add(from, to):
 		moves.append([from, to])
 		_cur_index = moves.size() -1
-		
-		
+
+
 	func goto_index(index):
 		var inc = sign(index - _cur_index)
 		while(_cur_index != index):
-			
+
 			if(inc == -1):
 				var m = moves[_cur_index]
 				_stone_grid.get_button_at(m[0]).stones += 1
@@ -30,10 +30,10 @@ class Undo:
 				var m = moves[_cur_index]
 				_stone_grid.get_button_at(m[0]).stones -= 1
 				_stone_grid.get_button_at(m[1]).stones += 1
-				
+
 			_stone_grid.moves = index
-			
-			
+
+
 	func undo():
 		if(moves.size() > 0):
 			_cur_index = moves.size() -1
@@ -41,12 +41,12 @@ class Undo:
 			_stone_grid.get_button_at(m[0]).stones += 1
 			_stone_grid.get_button_at(m[1]).stones -= 1
 			_stone_grid.moves -= 1
-	
-	
+
+
 	func size():
 		return moves.size()
-		
-		
+
+
 	func clear():
 		moves.clear()
 		_cur_index = 0
@@ -62,6 +62,8 @@ var _last_layout = null
 
 var wait_time = 0
 
+var wait_time = 0
+
 var moves = 0 :
 	get: return moves
 	set(val):
@@ -73,7 +75,7 @@ var moves = 0 :
 	grid = $Layout/Scroll/Grid,
 	moves_label = $Layout/Header/Moves,
 	stone_count = $Layout/Header/Stones,
-	
+
 	edit_button = $Layout/Header2/EditMode,
 	edit_buttons = $Layout/Header2/EditButtons,
 	edit_clear = $Layout/Header2/EditButtons/Clear,
@@ -175,6 +177,10 @@ func move_stone(from : Vector2, to : Vector2):
 	var to_btn = _stone_buttons[to.x][to.y]
 
 	if(from_btn != to_btn and from.distance_to(to) == 1.0 and from_btn.stones > 0):
+		print(from_btn, ' -> ', to_btn)
+		if(wait_time > 0):
+			from_btn.modulate = Color(1, 0, 0)
+			to_btn.modulate = Color(0, 1, 0)
 		p(from_btn, ' -> ', to_btn)
 		if(wait_time > 0):
 			from_btn.modulate = Color(0, 1, 0)
@@ -186,6 +192,11 @@ func move_stone(from : Vector2, to : Vector2):
 		moves += 1
 		undoer.add(from, to)
 		print_board()
+		if(wait_time > 0):
+			await get_tree().create_timer(wait_time).timeout
+			from_btn.modulate = Color(1, 1, 1)
+			to_btn.modulate = Color(1, 1, 1)
+
 		if(wait_time > 0):
 			from_btn.modulate = Color(1, 1, 1)
 			to_btn.modulate = Color(1, 1, 1)
@@ -299,11 +310,11 @@ func save_layout():
 			_last_layout.append([])
 			for j in range(grid_size()):
 				_last_layout[i].append(_stone_buttons[i][j].stones)
-				
+
 
 func show_check_counts():
 	call_on_buttons(func(btn): btn.show_check_count())
-	
+
 func show_change_counts():
 	call_on_buttons(func(btn): btn.show_change_count())
 

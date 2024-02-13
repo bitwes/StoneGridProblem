@@ -143,12 +143,12 @@ var ten_x_ten = {
 	c1_buttons_vbox = $Controls/Layout/Buttons,
 	c2_buttons_vbox = $Controls2/Layout/Buttons,
 	stone_arrangements = $Controls/Layout/Buttons/StoneArrangements,
-	
+
 	time = $Controls2/Layout/Time,
 	delay = $Controls2/Layout/Buttons/Delay,
 	orig_stone_grid = $StoneGrid,
 	stop = $Controls2/Layout/Stop,
-	
+
 	undo_slider = $UndoSlider
 }
 
@@ -156,9 +156,9 @@ var _stone_grid : StoneGrid = null
 var _running = false
 var _start_time = 0.0
 
-var solver = Solvers.BestIdea.new() : 
+var solver = Solvers.BestIdea.new() :
 	get: return solver
-	set(val): 
+	set(val):
 		solver = val
 		print('solver = ', solver, ' ', solver.get_script(), ' ', solver.get_class())
 
@@ -166,7 +166,7 @@ func _ready():
 	_ctrls.orig_stone_grid.visible = false
 	_stone_grid = _ctrls.orig_stone_grid
 	_ctrls.stop.visible = false
-	
+
 	var first = true
 	var bg = ButtonGroup.new()
 	for btn in $Controls2/Layout/Buttons/Solvers.get_children():
@@ -175,7 +175,7 @@ func _ready():
 			btn.button_pressed = true
 			btn.pressed.emit()
 			first = false
-		else: 
+		else:
 			btn.button_pressed = false
 
 	first = true
@@ -187,10 +187,10 @@ func _ready():
 			btn.button_pressed = true
 			btn.pressed.emit()
 			first = false
-		else: 
+		else:
 			btn.button_pressed = false
 
-		
+
 	_create_grid_all_at_center(20)
 	#_create_stone_grid(3, three_x_three)
 	#_create_stone_grid(10, ten_x_ten)
@@ -220,7 +220,7 @@ func _create_stone_grid(size : int, arrangements : Dictionary):
 func _make_populate_buttons(arrangements):
 	for child in _ctrls.stone_arrangements.get_children():
 		child.free()
-	
+
 	var g = ButtonGroup.new()
 	var first = true
 	for key in arrangements:
@@ -234,7 +234,7 @@ func _make_populate_buttons(arrangements):
 			btn.button_pressed = true
 			btn.pressed.emit()
 			first = false
-		else: 
+		else:
 			btn.button_pressed = false
 
 
@@ -252,7 +252,7 @@ func _run_mode(is_it):
 	_ctrls.stop.visible = is_it
 	_running = is_it
 	_ctrls.c1_buttons_vbox.visible = !is_it
-	_ctrls.c2_buttons_vbox.visible = !is_it	
+	_ctrls.c2_buttons_vbox.visible = !is_it
 
 func solve():
 	if(_stone_grid.is_solved()):
@@ -262,12 +262,12 @@ func solve():
 	set_process(false)
 	_run_mode(true)
 	_stone_grid.reset_counts()
-	
+
 	await get_tree().create_timer(.25).timeout
 	_start_time = Time.get_ticks_msec()
 	set_process(true)
 	await solver.solve(_stone_grid)
-	
+
 	_run_mode(false)
 	_stone_grid.wait_time = 0
 	_ctrls.undo_slider.max_value = _stone_grid.undoer.size() -1
