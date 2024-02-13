@@ -218,7 +218,7 @@ func _group_buttons(buttons):
 func _create_grid_all_at_center(s):
 	_create_stone_grid(s, {})
 	var btn = _stone_grid.get_button_at(Vector2(s/2, s/2))
-	btn.stones = s * s
+	btn.set_stone_count(s * s)
 
 
 func _create_stone_grid(size : int, arrangements : Dictionary):

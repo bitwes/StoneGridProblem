@@ -7,6 +7,7 @@ var _initial_waited = 0.0
 var _repeat = false
 var _sb : StyleBox = null
 
+
 var grid_pos = Vector2(-1, -1)
 var edit_increment = 1
 var increment_initial_delay = .5
@@ -24,23 +25,40 @@ var edit_mode = false :
 	set(val):
 		edit_mode = val
 		toggle_mode = !edit_mode
-var stones = 0 :
-	get:
-		_check_count += 1
-		return stones
-	set(val):
-		_change_count += 1
-		if(val >= 0):
-			stones = val
-			stones_changed.emit()
 
-		if(stones > 0):
-			text = str(stones)
-		else:
-			text = ' '
+
+var _stones = []
 
 
 signal stones_changed
+
+
+func add_stone(s):
+	if(_stones.size() == 0):
+		set_bg_color(s.color)
+	_stones.append(s)
+	_update_display()
+	stones_changed.emit()
+
+
+func take_stone():
+	var s = _stones.pop_back()
+	_update_display()
+	stones_changed.emit()
+	return s
+
+func set_stone_count(x):
+	_stones.clear()
+	for i in range(x):
+		var s = Stone.new()
+		s.color = get_bg_color()
+		_stones.append(s)
+	_update_display()
+	stones_changed.emit()
+
+
+func get_stone_count():
+	return _stones.size()
 
 
 func _init():
@@ -51,31 +69,35 @@ func _init():
 
 func _ready():
 	_sb = get("theme_override_styles/normal")
-	if(stones == -1):
-		text = str(grid_pos)
 
 
-func _process(delta):
-	if(_repeat):
-		_initial_waited += delta
-		if(_initial_waited >= increment_initial_delay):
-			_waited += delta
-			if(_waited > increment_repeat):
-				stones += edit_increment
-				_waited = 0.0
+func _update_display():
+	if(_stones.size() != 0):
+		text = str(_stones.size())
+	else:
+		text = ''
+
+# func _process(delta):
+# 	if(_repeat):
+# 		_initial_waited += delta
+# 		if(_initial_waited >= increment_initial_delay):
+# 			_waited += delta
+# 			if(_waited > increment_repeat):
+# 				stones += edit_increment
+# 				_waited = 0.0
 
 
-func _gui_input(event):
-	if(edit_mode):
-		if(event is InputEventMouseButton):
-			_repeat = event.pressed
-			_initial_waited = 0.0
-			if(event.pressed):
-				stones += edit_increment
+# func _gui_input(event):
+# 	if(edit_mode):
+# 		if(event is InputEventMouseButton):
+# 			_repeat = event.pressed
+# 			_initial_waited = 0.0
+# 			if(event.pressed):
+# 				stones += edit_increment
 
 
 func _to_string():
-	return str(grid_pos, '[', stones, ']')
+	return str(grid_pos, '[', _stones.size(), ']')
 
 
 # ---------------------------
@@ -99,7 +121,7 @@ func show_check_count():
 
 
 func show_stones():
-	text = str(stones)
+	# text = str(stones)
 	$ColorRect/Label.text = ""
 
 
@@ -109,6 +131,9 @@ func set_bg_color(c):
 		set("theme_override_colors/font_color", Color(1, 1, 1))
 	else:
 		set("theme_override_colors/font_color", Color(0, 0, 0))
+
+	for s in _stones:
+		s.color = c
 
 
 func get_bg_color():
@@ -121,3 +146,7 @@ func get_lumenescen(color : Color):
 
 func is_color_dark(color):
 	return get_lumenescen(color) < .6
+
+func clear():
+	_stones.clear()
+	_update_display()

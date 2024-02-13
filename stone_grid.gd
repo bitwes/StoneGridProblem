@@ -28,11 +28,13 @@ class Undo:
 
 
 	func add(from, to):
+		return
 		moves.append([from, to])
 		_cur_index = moves.size() -1
 
 
 	func goto_index(index):
+		return
 		if(index == _cur_index):
 			return
 		elif(index < -1 or index > moves.size() -1):
@@ -46,6 +48,7 @@ class Undo:
 
 
 	func undo():
+		return
 		if(moves.size() > 0):
 			var m = moves.pop_back()
 			_stone_grid.get_button_at(m[0]).stones += 1
@@ -65,6 +68,13 @@ class Undo:
 
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
+var colors = [
+	Color(1, 0, 0), Color(0, 1, 0), Color(0, 0, 1),
+	Color(1, 0, 1), Color(1, 1, 0), Color(0, 1, 1),
+	Color(.5, 0, .5), Color(.5, .5, 0), Color(0, .5, .5),
+	Color(1, .5, 1), Color(1, 1, .5), Color(.5, 1, 1),
+	Color(1, .5, .5), Color(.5, 1, .5), Color(.5, .5, 1),
+]
 
 const MODES = {
 	PLAY = 'play',
@@ -107,6 +117,19 @@ var moves = 0 :
 	edit_plus = $Layout/Header2/EditButtons/Plus,
 }
 
+var _cur_color_index = 0
+func _next_color():
+	var c = colors[_cur_color_index]
+	_cur_color_index += 1
+	if(_cur_color_index > colors.size()):
+		_cur_color_index = 0
+	return c
+
+func color_starting_stones():
+	call_on_buttons(func(btn):
+		if(btn.get_stone_count() > 1):
+			btn.set_bg_color(_next_color())
+	)
 
 func _ready():
 	_ctrls.edit_buttons.visible = false
@@ -133,7 +156,7 @@ func _update_count():
 	var count = 0
 	for i in range(grid_size()):
 		for j in range(grid_size()):
-			count += _stone_buttons[i][j].stones
+			count += _stone_buttons[i][j].get_stone_count()
 	_ctrls.stone_count.text = str('Stones: ', count)
 
 
@@ -173,7 +196,7 @@ func _on_stone_button_pressed(which : StoneButton):
 		if(_from == which):
 			return
 		elif(_from == null):
-			if(which.stones == 0):
+			if(which.get_stone_count() == 0):
 				which.button_pressed = false
 			else:
 				_from = which
@@ -194,7 +217,7 @@ func _on_plus_pressed():
 
 
 func _on_clear_pressed():
-	call_on_buttons(func(btn): btn.stones = 0)
+	call_on_buttons(func(btn): btn.clear())
 
 
 func _on_print_array_pressed():
@@ -219,17 +242,17 @@ func move_stone(from : Vector2, to : Vector2):
 	var from_btn = _stone_buttons[from.x][from.y]
 	var to_btn = _stone_buttons[to.x][to.y]
 
-	if(from_btn != to_btn and from.distance_to(to) == 1.0 and from_btn.stones > 0):
+	if(from_btn != to_btn and from.distance_to(to) == 1.0 and from_btn.get_stone_count() > 0):
 		p(from_btn, ' -> ', to_btn)
 
 		if(wait_time > 0):
 			from_btn.modulate = from_color
 			to_btn.modulate = to_color
 
-		from_btn .stones -= 1
+		var s = from_btn.take_stone()
 		if(wait_time > 0.0):
 			await _animate_move(from_btn, to_btn, wait_time).finished
-		to_btn.stones += 1
+		to_btn.add_stone(s)
 		moves += 1
 		undoer.add(from, to)
 
@@ -250,7 +273,7 @@ func get_button_at(pos : Vector2):
 
 
 func get_stones_at(pos):
-	return _stone_buttons[pos.x][pos.y].stones
+	return _stone_buttons[pos.x][pos.y].get_stone_count()
 
 
 func undo():
@@ -289,7 +312,7 @@ func populate(stones):
 	moves = 0
 	for i in stones.size():
 		for j in stones[i].size():
-			_stone_buttons[i][j].stones = stones[i][j]
+			_stone_buttons[i][j].set_stone_count(stones[i][j])
 			_stone_buttons[i][j].set_bg_color(Color(0, 0, 0))
 	_update_count()
 
@@ -329,7 +352,7 @@ func get_num_wrong():
 	var num_wrong = 0
 	for i in range(grid_size()):
 		for j in range(grid_size()):
-			if(_stone_buttons[i][j].stones > 1):
+			if(_stone_buttons[i][j].get_stone_count() > 1):
 				num_wrong += 1
 	return num_wrong
 
@@ -344,7 +367,7 @@ func save_layout():
 		for i in range(grid_size()):
 			_last_layout.append([])
 			for j in range(grid_size()):
-				_last_layout[i].append(_stone_buttons[i][j].stones)
+				_last_layout[i].append(_stone_buttons[i][j].get_stone_count())
 
 
 func show_check_counts():

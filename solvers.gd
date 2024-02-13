@@ -11,14 +11,6 @@ class BaseSolver:
 
 	var max_attempts = 200
 
-	var colors = [
-		Color(1, 0, 0), Color(0, 1, 0), Color(0, 0, 1),
-		Color(1, 0, 1), Color(1, 1, 0), Color(0, 1, 1),
-		Color(.5, 0, .5), Color(.5, .5, 0), Color(0, .5, .5),
-		Color(1, .5, 1), Color(1, 1, .5), Color(.5, 1, 1),
-		Color(1, .5, .5), Color(.5, 1, .5), Color(.5, .5, 1),
-		]
-
 
 	func get_surrounding_squares(pos : Vector2):
 		var to_return = []
@@ -43,7 +35,7 @@ class BaseSolver:
 			for j in range(_grid.grid_size()):
 				var pos = Vector2(i, j)
 				var btn = _grid.get_button_at(pos)
-				if(btn.stones == 0):
+				if(btn.get_stone_count() == 0):
 					to_return.append(btn)
 		return to_return
 
@@ -77,7 +69,7 @@ class BaseSolver:
 	func push_in_direction_of(pos : Vector2, target_button : StoneButton):
 		var here = _grid.get_button_at(pos)
 		var to = null
-		if(here.stones > 1):
+		if(here.get_stone_count() > 1):
 			if(target_button != null):
 				var xdiff = target_button.grid_pos.x - pos.x
 				var ydiff = target_button.grid_pos.y - pos.y
@@ -93,7 +85,7 @@ class BaseSolver:
 	func get_button_in_direction(pos : Vector2, target_button : StoneButton):
 		var here = _grid.get_button_at(pos)
 		var to = null
-		if(here.stones > 1):
+		if(here.get_stone_count() > 1):
 			if(target_button != null):
 				var xdiff = target_button.grid_pos.x - pos.x
 				var ydiff = target_button.grid_pos.y - pos.y
@@ -122,10 +114,10 @@ class BaseSolver:
 		var to = get_button_in_direction(pos, target)
 		if(to != null):
 			var dist = calc_moves_to(here, to)
-			if(to.stones == 0):
+			if(to.get_stone_count() == 0):
 				to.set_bg_color(c)
 
-			while(moved < int(dist) and here.stones > 1):
+			while(moved < int(dist) and here.get_stone_count() > 1):
 				await _grid.move_stone(pos, to.grid_pos)
 				moved += 1
 
@@ -134,18 +126,12 @@ class BaseSolver:
 
 
 	func _get_buttons_with_spreadable_stones():
-		var cur_color_idx = 0
-
 		var btns = []
 		for i in range(_grid.grid_size()):
 			for j in range(_grid.grid_size()):
 				var btn = _grid.get_button_at(Vector2(i, j))
-				if(btn.stones > 1):
+				if(btn.get_stone_count() > 1):
 					btns.append(btn)
-					btn.set_bg_color(colors[cur_color_idx])
-					cur_color_idx += 1
-					if(cur_color_idx > colors.size() -1):
-						cur_color_idx = 0
 		return btns
 
 
@@ -157,7 +143,8 @@ class BaseSolver:
 	func solve(grid : StoneGrid):
 		_should_run = true
 		_grid = grid
-		grid.print_board()
+		_grid.print_board()
+		_grid.color_starting_stones()
 
 		var prev_mode = _grid.mode
 		_grid.mode = _grid.MODES.SOLVE
@@ -254,7 +241,7 @@ class BestIdea:
 	func attempt(here, r):
 		var target = _get_closest_zero_in_range(here, r)
 		here.set_color(Color(1, 1, 1, .5))
-		while(target != null and here.stones > 1):
+		while(target != null and here.get_stone_count() > 1):
 			if(!_should_run):
 				return
 			target.set_color(Color(0, 0, 1, .5))
@@ -270,7 +257,7 @@ class BestIdea:
 
 		# Move piles that have the most amount of stones first.
 		spreadable.sort_custom(func(a, b):
-			return a.stones > b.stones)
+			return a.get_stone_count() > b.get_stone_count())
 
 		var r = 1
 		while(!_grid.is_solved() and _passes <= max_attempts):
