@@ -113,6 +113,9 @@ layout_mode = 2
 [node name="Checks" type="Label" parent="Controls2/Layout/Buttons/Stats"]
 layout_mode = 2
 
+[node name="Passes" type="Label" parent="Controls2/Layout/Buttons/Stats"]
+layout_mode = 2
+
 [node name="Delay" type="SpinBox" parent="Controls2/Layout/Buttons"]
 layout_mode = 2
 max_value = 2.0
@@ -132,6 +135,7 @@ offset_left = 216.0
 offset_top = 592.0
 offset_right = 920.0
 offset_bottom = 614.0
+min_value = -1.0
 
 [connection signal="pressed" from="Controls/Layout/Buttons/Layouts/ThreeXThree" to="." method="_on_three_x_three_pressed"]
 [connection signal="pressed" from="Controls/Layout/Buttons/Layouts/TenXTen" to="." method="_on_ten_x_ten_pressed"]
@@ -141,5 +145,4 @@ offset_bottom = 614.0
 [connection signal="pressed" from="Controls2/Layout/Buttons/Solvers/BestIdea" to="." method="_on_best_idea_pressed"]
 [connection signal="pressed" from="Controls2/Layout/Buttons/Solve" to="." method="_on_solve_pressed"]
 [connection signal="pressed" from="Controls2/Layout/Buttons/Reset" to="." method="_on_reset_pressed"]
-[connection signal="drag_ended" from="UndoSlider" to="." method="_on_undo_slider_drag_ended"]
 [connection signal="value_changed" from="UndoSlider" to="." method="_on_undo_slider_value_changed"]
