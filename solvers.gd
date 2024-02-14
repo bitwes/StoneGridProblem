@@ -1,5 +1,12 @@
 class_name Solvers
 
+static var TheListOfSolvers = [
+	['This One', ThisOne],
+	['Push Till We Get There', PushTillWeGetThere],
+	['Best Idea', BestIdea]
+]
+
+
 class BaseSolver:
 	var _grid : StoneGrid = null
 	var _should_run = true
@@ -194,8 +201,8 @@ class ThisOne:
 
 
 # ------------------------------------------------------------------------------
-# * Loop through board, any spot that has more than one pushes one to the
-#   closest open spot
+# * Loop through board, any spot that has more than one pushes one all the way
+#   to the closest open spot
 # * Repeat until solved
 # ------------------------------------------------------------------------------
 class PushTillWeGetThere:
@@ -228,9 +235,9 @@ class PushTillWeGetThere:
 
 
 # ------------------------------------------------------------------------------
-# * Get the starting stone locations
-# * Push out from each starting location to a range
-# * Increase range and repeat
+# * Get the starting stone locations, sort them by size descending.
+# * Push out from each starting location open spaces within a range
+# * Increase range and repeat pushing.
 # ------------------------------------------------------------------------------
 class BestIdea:
 	extends BaseSolver

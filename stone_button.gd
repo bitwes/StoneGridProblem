@@ -2,11 +2,13 @@ class_name StoneButton
 extends Button
 
 
+var _stones = []
 var _waited = 0.0
 var _initial_waited = 0.0
 var _repeat = false
 var _sb : StyleBox = null
 var _should_highlight = false
+
 
 var highlight_color = Color(1, 1, 1)
 var default_bg_color = Color(0, 0, 0)
@@ -14,69 +16,28 @@ var grid_pos = Vector2(-1, -1)
 var edit_increment = 1
 var increment_initial_delay = .5
 var increment_repeat = .1
+
 var _change_count = 0
 var change_count = 0 :
 	get: return _change_count
 	set(val):  pass
+
 var _check_count = 0
 var check_count = 0 :
 	get: return _check_count
 	set(val): pass
+
 var edit_mode = false :
 	get: return edit_mode
 	set(val):
 		edit_mode = val
 		toggle_mode = !edit_mode
 
+
 @onready var _draw_on_this = $DrawLayer
-var _stones = []
 
 
 signal stones_changed
-
-func highlight(c = highlight_color):
-	_should_highlight = true
-	highlight_color = c
-	_draw_on_this.queue_redraw()
-
-func stop_highlight():
-	_should_highlight = false
-	_draw_on_this.queue_redraw()
-
-func add_stone(s):
-	if(s == null):
-		return
-
-	if(_stones.size() == 0 and get_bg_color() == default_bg_color):
-		set_bg_color(s.color)
-
-	_stones.append(s)
-	_update_display()
-	_change_count += 1
-	stones_changed.emit()
-
-
-func take_stone():
-	var s = _stones.pop_back()
-	_update_display()
-	stones_changed.emit()
-	_change_count += 1
-
-	return s
-
-func set_stone_count(x):
-	_stones.clear()
-	for i in range(x):
-		var s = Stone.new()
-		s.color = get_bg_color()
-		_stones.append(s)
-	_update_display()
-	stones_changed.emit()
-
-
-func get_stone_count():
-	_check_count += 1
-	return _stones.size()
 
 
 func _init():
@@ -96,12 +57,6 @@ func _draw_on(which):
 		var thickness = size.x * .05
 		which.draw_rect(Rect2(Vector2(thickness, thickness)/2, get_rect().size - Vector2(thickness, thickness)), highlight_color, false, thickness)
 
-
-func _update_display():
-	if(_stones.size() != 0):
-		text = str(_stones.size())
-	else:
-		text = ''
 
 func _process(delta):
 	if(_repeat):
@@ -132,6 +87,12 @@ func _gui_input(event):
 func _to_string():
 	return str(grid_pos, '[', _stones.size(), ']')
 
+
+func _update_display():
+	if(_stones.size() != 0):
+		text = str(_stones.size())
+	else:
+		text = ''
 
 # ---------------------------
 # Public
@@ -180,9 +141,57 @@ func get_lumenescen(color : Color):
 func is_color_dark(color):
 	return get_lumenescen(color) < .6
 
+
 func clear():
 	_change_count = 0
 	_check_count = 0
 	_stones.clear()
 	set_bg_color(default_bg_color)
 	_update_display()
+
+
+func highlight(c = highlight_color):
+	_should_highlight = true
+	highlight_color = c
+	_draw_on_this.queue_redraw()
+
+
+func stop_highlight():
+	_should_highlight = false
+	_draw_on_this.queue_redraw()
+
+
+func add_stone(s):
+	if(s == null):
+		return
+
+	if(_stones.size() == 0 and get_bg_color() == default_bg_color):
+		set_bg_color(s.color)
+
+	_stones.append(s)
+	_update_display()
+	_change_count += 1
+	stones_changed.emit()
+
+
+func take_stone():
+	var s = _stones.pop_back()
+	_update_display()
+	stones_changed.emit()
+	_change_count += 1
+
+	return s
+
+func set_stone_count(x):
+	_stones.clear()
+	for i in range(x):
+		var s = Stone.new()
+		s.color = get_bg_color()
+		_stones.append(s)
+	_update_display()
+	stones_changed.emit()
+
+
+func get_stone_count():
+	_check_count += 1
+	return _stones.size()

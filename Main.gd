@@ -12,178 +12,22 @@ extends Node2D
 
 var StoneGridScene = load("res://stone_grid.tscn")
 
-# -------------------------
-var three_x_three = {
-# -------------------------
-	diag_three = [
-		[3, 0, 0],
-		[0, 3, 0],
-		[0, 0, 3]
-	],
-	nine_center = [
-		[0, 0, 0],
-		[0, 9, 0],
-		[0, 0, 0]
-	],
-	three_center_line = [
-		[0, 3, 0],
-		[0, 3, 0],
-		[0, 3, 0]
-	],
-	harder = [
-		[5, 0, 0],
-		[0, 2, 0],
-		[2, 0, 0]
-	],
-	harder_inverse = [
-		[0, 0, 2],
-		[0, 2, 0],
-		[0, 0, 5]
-	],
-	tl = [
-		[9, 0, 0],
-		[0, 0, 0],
-		[0, 0, 0]
-	],
-	br = [
-		[0, 0, 0],
-		[0, 0, 0],
-		[0, 0, 9]
-	],
-
-}
-
-# -------------------------
-var seven_x_seven = {
-# -------------------------
-	seven_center = [
-		[0, 0, 0, 7, 0, 0, 0],
-		[0, 0, 0, 7, 0, 0, 0],
-		[0, 0, 0, 7, 0, 0, 0],
-		[0, 0, 0, 7, 0, 0, 0],
-		[0, 0, 0, 7, 0, 0, 0],
-		[0, 0, 0, 7, 0, 0, 0],
-		[0, 0, 0, 7, 0, 0, 0],
-	],
-
-	forty_nine_center = {
-		Vector2(3, 3) : 49
-	},
-	tl = {
-		Vector2(0, 0) : 49
-	},
-	br = {
-		Vector2(6, 6) : 49
-	}
-}
-
-# -------------------------
-var ten_x_ten = {
-# -------------------------
-	ten_center = [
-		[0, 0, 0, 0, 0, 10, 0, 0, 0, 0],
-		[0, 0, 0, 0, 0, 10, 0, 0, 0, 0],
-		[0, 0, 0, 0, 0, 10, 0, 0, 0, 0],
-		[0, 0, 0, 0, 0, 10, 0, 0, 0, 0],
-		[0, 0, 0, 0, 0, 10, 0, 0, 0, 0],
-		[0, 0, 0, 0, 0, 10, 0, 0, 0, 0],
-		[0, 0, 0, 0, 0, 10, 0, 0, 0, 0],
-		[0, 0, 0, 0, 0, 10, 0, 0, 0, 0],
-		[0, 0, 0, 0, 0, 10, 0, 0, 0, 0],
-		[0, 0, 0, 0, 0, 10, 0, 0, 0, 0],
-	],
-	hundred_center = {
-		Vector2(5, 5) : 100
-	},
-	various_tens = [
-		[0, 0, 0, 0, 0, 0, 0, 0, 0, 10],
-		[0, 0, 10, 0, 0, 0, 0, 0, 0, 0],
-		[0, 0, 0, 0, 0, 0, 0, 0, 10, 0],
-		[10, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-		[0, 0, 0, 0, 0, 0, 10, 0, 0, 0],
-		[0, 0, 0, 10, 0, 0, 0, 0, 0, 0],
-		[0, 0, 0, 0, 0, 0, 0, 0, 0, 10],
-		[0, 0, 0, 0, 10, 0, 0, 0, 0, 0],
-		[0, 0, 0, 10, 0, 0, 0, 0, 0, 0],
-		[0, 0, 0, 0, 0, 0, 0, 0, 10, 0],
-	],
-	various_tens_two = [
-		[10,0,0,0,0,10,0,0,0,10,],
-		[0,0,0,0,0,0,0,0,0,0,],
-		[0,0,0,0,0,10,0,0,0,0,],
-		[0,0,0,0,0,0,0,0,0,0,],
-		[0,0,0,0,0,10,0,0,0,0,],
-		[0,0,0,0,0,10,0,0,0,0,],
-		[0,0,0,0,0,0,0,0,0,0,],
-		[0,0,0,0,0,10,0,0,0,0,],
-		[0,0,0,0,0,0,0,0,0,0,],
-		[10,0,0,0,0,10,0,0,0,10,],
-	],
-	misc = [
-		[0,0,0,0,15,0,0,0,0,0,],
-		[0,5,0,0,0,0,0,0,0,0,],
-		[0,0,0,0,0,0,0,13,0,0,],
-		[0,0,0,0,0,0,0,0,0,0,],
-		[0,0,0,0,0,0,0,0,0,0,],
-		[0,0,0,0,0,0,0,0,0,0,],
-		[0,16,0,0,0,0,0,0,20,0,],
-		[0,0,0,0,0,0,0,0,0,0,],
-		[0,0,0,14,0,0,0,0,0,0,],
-		[0,0,0,0,0,0,11,0,0,6,],
-	],
-	corners = {
-		Vector2(0, 0) : 25,
-		Vector2(0, 9) : 25,
-		Vector2(9, 0) : 25,
-		Vector2(9, 9) : 25
-	},
-	tl = {
-		Vector2(0, 0) : 100
-	},
-	br = {
-		Vector2(9, 9) : 100
-	}
-}
-
-# -------------------------
-# 225
-var fifteen_x_fifteen = {
-# -------------------------
-	centered = {
-		Vector2(7, 7) : 15 * 15
-	},
-	near_corners = {
-		Vector2(3, 3) : 56,
-		Vector2(3, 11) : 56,
-		Vector2(11, 3) : 56,
-		Vector2(11, 11) : 56,
-		Vector2(7, 7) : 1,
-	},
-	near_corners_plus = {
-		Vector2(3, 3) : 40,
-		Vector2(3, 11) : 40,
-		Vector2(11, 3) : 40,
-		Vector2(11, 11) : 40,
-		Vector2(7, 7) : 65,
-	}
-
-}
-
 
 @onready var _ctrls = {
-	c1_buttons_vbox = $Controls/Layout/Buttons,
-	c2_buttons_vbox = $Controls2/Layout/Buttons,
-	stone_arrangements = $Controls/Layout/Buttons/StoneArrangements,
+	c1_buttons_vbox = $Layout/Controls/Layout/Buttons,
+	c2_buttons_vbox = $Layout/Controls2/Layout/Buttons,
+	stone_arrangements = $Layout/Controls/Layout/Buttons/StoneArrangements,
 
-	time = $Controls2/Layout/Time,
-	delay = $Controls2/Layout/Buttons/Delay,
-	orig_stone_grid = $StoneGrid,
-	stop = $Controls2/Layout/Stop,
-	moves = $Controls2/Layout/Buttons/Stats/Moves,
-	checks = $Controls2/Layout/Buttons/Stats/Checks,
-	passes = $Controls2/Layout/Buttons/Stats/Passes,
+	time = $Layout/Controls2/Layout/Time,
+	delay = $Layout/Controls2/Layout/Buttons/Delay,
+	orig_stone_grid = $Layout/CenterBox/StoneGrid,
+	stop = $Layout/Controls2/Layout/Stop,
+	moves = $Layout/Controls2/Layout/Buttons/Stats/Moves,
+	checks = $Layout/Controls2/Layout/Buttons/Stats/Checks,
+	passes = $Layout/Controls2/Layout/Buttons/Stats/Passes,
+	solver_buttons = $Layout/Controls2/Layout/Buttons/Solvers,
 
-	undo_slider = $UndoSlider,
+	undo_slider = $Layout/CenterBox/UndoSlider,
 }
 
 var _stone_grid : StoneGrid = null
@@ -202,12 +46,16 @@ func _ready():
 	_stone_grid = _ctrls.orig_stone_grid
 	_ctrls.stop.visible = false
 
-	_group_buttons($Controls2/Layout/Buttons/Solvers.get_children())
-	_group_buttons($Controls/Layout/Buttons/Layouts.get_children())
+	_group_buttons($Layout/Controls2/Layout/Buttons/Solvers.get_children())
+	_group_buttons($Layout/Controls/Layout/Buttons/Layouts.get_children())
 
-	_create_stone_grid(3, three_x_three)
-	# _create_stone_grid(10, ten_x_ten)
-	#_create_grid_all_at_center(20)
+	for entry in Solvers.TheListOfSolvers:
+		_add_solver_button(entry[0], entry[1])
+	_group_buttons(_ctrls.solver_buttons.get_children())
+
+	_create_stone_grid(3, Layouts.three_x_three)
+	
+	$Layout.set_deferred('size', get_viewport_rect().size)
 
 
 func _process(__delta):
@@ -243,7 +91,11 @@ func _create_stone_grid(size : int, arrangements : Dictionary):
 		_stone_grid.queue_free()
 
 	_stone_grid = StoneGridScene.instantiate()
-	add_child(_stone_grid)
+	_stone_grid.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_stone_grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	$Layout/CenterBox.add_child(_stone_grid)
+	$Layout/CenterBox.move_child(_stone_grid, 0)
+	_stone_grid.undoer.slider = _ctrls.undo_slider
 	_stone_grid.position = _ctrls.orig_stone_grid.position
 	_stone_grid.size = _ctrls.orig_stone_grid.size
 
@@ -275,6 +127,13 @@ func _make_populate_buttons(arrangements):
 			btn.button_pressed = false
 
 
+func _add_solver_button(text, solver_class):
+	var btn = Button.new()
+	btn.text = text
+	btn.pressed.connect(_on_solver_button_pressed.bind(solver_class))
+	_ctrls.solver_buttons.add_child(btn)
+
+
 func _update_time():
 	var t = (Time.get_ticks_msec() - _start_time) / 1000.0
 	_ctrls.time.text = str("%.3f" % t, 's')
@@ -295,63 +154,32 @@ func _on_solve_pressed():
 	solve()
 
 
-func _on_diag_threes_pressed():
-	_stone_grid.populate(three_x_three.diag_three)
-
-
-func _on_center_nine_pressed():
-	_stone_grid.populate(three_x_three.nine_center)
-
-
-func _on_center_line_three_pressed():
-	_stone_grid.populate(three_x_three.three_center_line)
-
-
-func _on_harder_pressed():
-	_stone_grid.populate(three_x_three.harder)
-
-
-func _on_harder_inverse_pressed():
-	_stone_grid.populate(three_x_three.harder_inverse)
-
-
 func _on_three_x_three_pressed():
-	_create_stone_grid(3, three_x_three)
+	_create_stone_grid(3, Layouts.three_x_three)
 
 
 func _on_seven_x_seven_pressed():
-	_create_stone_grid(7, seven_x_seven)
+	_create_stone_grid(7, Layouts.seven_x_seven)
 
 
 func _on_ten_x_ten_pressed():
-	_create_stone_grid(10, ten_x_ten)
+	_create_stone_grid(10, Layouts.ten_x_ten)
+
 
 func _on_fifteen_x_fifteen_pressed():
-	_create_stone_grid(15, fifteen_x_fifteen)
+	_create_stone_grid(15, Layouts.fifteen_x_fifteen)
 
 
 func _on_reset_pressed():
 	_stone_grid.reset()
+	_stone_grid.reload_layout()
 
 
-func _on_this_one_pressed():
-	solver = Solvers.ThisOne.new()
-
-
-func _on_push_until_pressed():
-	solver = Solvers.PushTillWeGetThere.new()
-
-
-func _on_best_idea_pressed():
-	solver = Solvers.BestIdea.new()
-
+func _on_solver_button_pressed(solver_class):
+	solver = solver_class.new()
 
 func _on_stop_pressed():
 	solver.stop()
-
-
-func _on_undo_slider_value_changed(value):
-	_stone_grid.undoer.goto_index(_ctrls.undo_slider.value)
 
 
 
@@ -359,15 +187,16 @@ func _on_undo_slider_value_changed(value):
 # Public
 # ------------------------
 func solve():
+	_ctrls.undo_slider.editable = false
 	if(_stone_grid.is_solved()):
-		_stone_grid.reset()
-	_ctrls.undo_slider.max_value = 0
+		_stone_grid.reload_layout()
+
 	_stone_grid.save_layout()
+	_stone_grid.reset()
 	_stone_grid.wait_time = _ctrls.delay.value
 	set_process(false)
 	_run_mode(true)
-	_stone_grid.reset_counts()
-
+	_ctrls.time.text = '0.0'
 	await get_tree().create_timer(.25).timeout
 	_start_time = Time.get_ticks_msec()
 	set_process(true)
@@ -375,13 +204,12 @@ func solve():
 	_run_mode(false)
 
 	_stone_grid.wait_time = 0
-	_ctrls.undo_slider.max_value = _stone_grid.undoer.size() -1
-	_ctrls.undo_slider.value = _stone_grid.undoer.size() -1
 	_update_time()
 
 	_ctrls.moves.text = str('Moves:  ', _stone_grid.moves)
 	_ctrls.checks.text = str('Checks:  ', _stone_grid.get_check_count())
 	_ctrls.passes.text = str('Passes:  ', solver.passes)
+	_ctrls.undo_slider.editable = true
 	#_stone_grid.show_change_counts()
 
 

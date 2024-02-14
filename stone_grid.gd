@@ -5,10 +5,33 @@ class Undo:
 	var moves = []
 	var _stone_grid = null
 	var _cur_index = 0
-
+	var _ignore_slider = false
+	var slider : HSlider = null :
+		get: return slider
+		set(val):
+			slider = val
+			slider.value_changed.connect(_on_slider_value_changed)
+			_update_slider()
 
 	func _init(stone_grid):
 		_stone_grid = stone_grid
+
+
+	func _update_slider():
+		if(slider == null):
+			return
+
+		_ignore_slider = true
+		slider.max_value = moves.size()
+		slider.value = moves.size()
+		_ignore_slider = false
+
+
+	func _on_slider_value_changed(value):
+		if(_ignore_slider):
+			return
+		goto_index(slider.value)
+		_stone_grid.moves = slider.value + 1
 
 
 	func _redo_x(x):
@@ -30,6 +53,7 @@ class Undo:
 	func add(from, to):
 		moves.append([from, to])
 		_cur_index = moves.size() -1
+		_update_slider()
 
 
 	func goto_index(index):
@@ -53,6 +77,7 @@ class Undo:
 
 			_stone_grid.moves -= 1
 			_cur_index = moves.size() -1
+			_update_slider()
 
 
 	func size():
@@ -62,6 +87,7 @@ class Undo:
 	func clear():
 		moves.clear()
 		_cur_index = 0
+		_update_slider()
 
 
 # ------------------------------------------------------------------------------
@@ -102,6 +128,7 @@ var moves = 0 :
 	set(val):
 		moves = val
 		_ctrls.moves_label.text = str('Moves: ', val)
+var _cur_color_index = 0
 
 
 @onready var _ctrls = {
@@ -114,20 +141,6 @@ var moves = 0 :
 	edit_clear = $Layout/Header2/EditButtons/Clear,
 	edit_plus = $Layout/Header2/EditButtons/Plus,
 }
-
-var _cur_color_index = 0
-func _next_color():
-	var c = colors[_cur_color_index]
-	_cur_color_index += 1
-	if(_cur_color_index > colors.size() -1):
-		_cur_color_index = 0
-	return c
-
-func color_starting_stones():
-	call_on_buttons(func(btn):
-		if(btn.get_stone_count() > 1):
-			btn.set_bg_color(_next_color())
-	)
 
 func _ready():
 	_ctrls.edit_buttons.visible = false
@@ -155,7 +168,8 @@ func _update_count():
 	for i in range(grid_size()):
 		for j in range(grid_size()):
 			count += _stone_buttons[i][j].get_stone_count()
-	_ctrls.stone_count.text = str('Stones: ', count)
+	var s = grid_size() * grid_size()
+	_ctrls.stone_count.text = str('Stones: ', count, ' of ', s)
 
 
 func _update_for_mode():
@@ -163,6 +177,13 @@ func _update_for_mode():
 	call_on_buttons(func(btn): btn.edit_mode = mode == MODES.EDIT)
 	_update_count()
 
+
+func _next_color():
+	var c = colors[_cur_color_index]
+	_cur_color_index += 1
+	if(_cur_color_index > colors.size() -1):
+		_cur_color_index = 0
+	return c
 
 # ------------------------
 # Events
@@ -178,6 +199,7 @@ func _on_undo_pressed():
 
 func _on_reset_pressed():
 	reset()
+	reload_layout()
 
 
 func _on_edit_mode_pressed():
@@ -227,6 +249,7 @@ func _on_print_array_pressed():
 # ------------------------
 func clear():
 	call_on_buttons(func(btn): btn.clear())
+
 
 func p(s1='', s2='', s3='', s4='', s5='', s6='', s7='', s8=''):
 	if(log_enabled):
@@ -308,7 +331,7 @@ func _populate_array(stones):
 			_stone_buttons[i][j].set_bg_color(Color(0, 0, 0))
 	_update_count()
 
-	
+
 func _populate_dictionary(stones):
 	for key in stones:
 		var btn = _stone_buttons[key.x][key.y]
@@ -324,11 +347,15 @@ func populate(stones):
 		_populate_dictionary(stones)
 
 
-func reset():
+func reload_layout():
 	if(_last_layout != null):
 		populate(_last_layout)
-		moves = 0
-		undoer.clear()
+
+
+func reset():
+	moves = 0
+	reset_counts()
+	undoer.clear()
 
 
 func grid_size():
@@ -395,3 +422,10 @@ func get_check_count():
 		for j in range(grid_size()):
 			val += _stone_buttons[i][j].check_count
 	return val
+
+
+func color_starting_stones():
+	call_on_buttons(func(btn):
+		if(btn.get_stone_count() > 1):
+			btn.set_bg_color(_next_color())
+	)
