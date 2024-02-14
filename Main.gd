@@ -54,7 +54,7 @@ func _ready():
 	_group_buttons(_ctrls.solver_buttons.get_children())
 
 	_create_stone_grid(3, Layouts.three_x_three)
-	
+
 	$Layout.set_deferred('size', get_viewport_rect().size)
 
 
