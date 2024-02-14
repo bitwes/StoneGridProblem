@@ -15,26 +15,24 @@ class Undo:
 		for i in range(x):
 			_cur_index += 1
 			var m = moves[_cur_index]
-			_stone_grid.get_button_at(m[0]).stones -= 1
-			_stone_grid.get_button_at(m[1]).stones += 1
+			var s = _stone_grid.get_button_at(m[0]).take_stone()
+			_stone_grid.get_button_at(m[1]).add_stone(s)
 
 
 	func _undo_x(x):
 		for i in range(x):
 			var m = moves[_cur_index]
-			_stone_grid.get_button_at(m[0]).stones += 1
-			_stone_grid.get_button_at(m[1]).stones -= 1
+			var s = _stone_grid.get_button_at(m[1]).take_stone()
+			_stone_grid.get_button_at(m[0]).add_stone(s)
 			_cur_index -= 1
 
 
 	func add(from, to):
-		return
 		moves.append([from, to])
 		_cur_index = moves.size() -1
 
 
 	func goto_index(index):
-		return
 		if(index == _cur_index):
 			return
 		elif(index < -1 or index > moves.size() -1):
@@ -48,11 +46,11 @@ class Undo:
 
 
 	func undo():
-		return
 		if(moves.size() > 0):
 			var m = moves.pop_back()
-			_stone_grid.get_button_at(m[0]).stones += 1
-			_stone_grid.get_button_at(m[1]).stones -= 1
+			var s = _stone_grid.get_button_at(m[1]).take_stone()
+			_stone_grid.get_button_at(m[0]).add_stone(s)
+
 			_stone_grid.moves -= 1
 			_cur_index = moves.size() -1
 
@@ -121,7 +119,7 @@ var _cur_color_index = 0
 func _next_color():
 	var c = colors[_cur_color_index]
 	_cur_color_index += 1
-	if(_cur_color_index > colors.size()):
+	if(_cur_color_index > colors.size() -1):
 		_cur_color_index = 0
 	return c
 
@@ -143,7 +141,7 @@ func _animate_move(from_btn : StoneButton, to_btn : StoneButton, duration : floa
 	lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	lbl.text = '1'
-	lbl.modulate = Color(0, 1, 0)
+	lbl.add_theme_color_override("font_color", from_btn.get("theme_override_colors/font_color"))
 
 	var t = from_btn.create_tween()
 	t.finished.connect(func ():  lbl.queue_free())
@@ -217,7 +215,7 @@ func _on_plus_pressed():
 
 
 func _on_clear_pressed():
-	call_on_buttons(func(btn): btn.clear())
+	clear()
 
 
 func _on_print_array_pressed():
@@ -227,6 +225,9 @@ func _on_print_array_pressed():
 # ------------------------
 # Public
 # ------------------------
+func clear():
+	call_on_buttons(func(btn): btn.clear())
+
 func p(s1='', s2='', s3='', s4='', s5='', s6='', s7='', s8=''):
 	if(log_enabled):
 		print(s1, s2, s3, s4, s5, s6, s7, s8)
@@ -245,10 +246,6 @@ func move_stone(from : Vector2, to : Vector2):
 	if(from_btn != to_btn and from.distance_to(to) == 1.0 and from_btn.get_stone_count() > 0):
 		p(from_btn, ' -> ', to_btn)
 
-		if(wait_time > 0):
-			from_btn.modulate = from_color
-			to_btn.modulate = to_color
-
 		var s = from_btn.take_stone()
 		if(wait_time > 0.0):
 			await _animate_move(from_btn, to_btn, wait_time).finished
@@ -257,10 +254,6 @@ func move_stone(from : Vector2, to : Vector2):
 		undoer.add(from, to)
 
 		print_board()
-		if(wait_time > 0):
-			await get_tree().create_timer(wait_time).timeout
-			from_btn.modulate = Color.WHITE
-			to_btn.modulate = Color.WHITE
 
 		return true
 	else:
@@ -306,8 +299,7 @@ func set_grid_size(s):
 			b.stones_changed.connect(_on_stones_changed)
 			_stone_buttons[i][j] = b
 
-
-func populate(stones):
+func _populate_array(stones):
 	_last_layout = stones
 	moves = 0
 	for i in stones.size():
@@ -315,6 +307,21 @@ func populate(stones):
 			_stone_buttons[i][j].set_stone_count(stones[i][j])
 			_stone_buttons[i][j].set_bg_color(Color(0, 0, 0))
 	_update_count()
+
+	
+func _populate_dictionary(stones):
+	for key in stones:
+		var btn = _stone_buttons[key.x][key.y]
+		btn.set_stone_count(stones[key])
+		btn.set_bg_color(Color.BLACK)
+
+
+func populate(stones):
+	clear()
+	if(typeof(stones) == TYPE_ARRAY):
+		_populate_array(stones)
+	elif(typeof(stones) == TYPE_DICTIONARY):
+		_populate_dictionary(stones)
 
 
 func reset():

@@ -184,7 +184,13 @@ class ThisOne:
 			for j in range(_grid.grid_size()):
 				var pos = Vector2(i, j)
 				var target = get_closest_zero(pos)
-				await push_in_direction_of(pos, target)
+				var here = _grid.get_button_at(pos)
+				if(here != null and target != null):
+					here.highlight()
+					target.highlight()
+					await push_in_direction_of(pos, target)
+					here.stop_highlight()
+					target.stop_highlight()
 
 
 # ------------------------------------------------------------------------------
@@ -213,12 +219,12 @@ class PushTillWeGetThere:
 				var pos = Vector2(i, j)
 				var target = get_closest_zero(pos)
 				var here = _grid.get_button_at(pos)
-				here.set_color(Color(1, 1, 1, .5))
+				here.highlight()
 				if(target != null):
-					target.set_color(Color(0, 0, 1, .5))
+					target.highlight()
 					await push_untl_there(pos, target)
-					target.set_color(Color(0, 0, 0, 0))
-				here.set_color(Color(0, 0, 0, 0))
+					target.stop_highlight()
+				here.stop_highlight()
 
 
 # ------------------------------------------------------------------------------
@@ -240,15 +246,15 @@ class BestIdea:
 
 	func attempt(here, r):
 		var target = _get_closest_zero_in_range(here, r)
-		here.set_color(Color(1, 1, 1, .5))
+		here.highlight()
 		while(target != null and here.get_stone_count() > 1):
 			if(!_should_run):
 				return
-			target.set_color(Color(0, 0, 1, .5))
+			target.highlight()
 			await push_untl_there(here.grid_pos, target)
-			target.set_color(Color(0, 0, 0, 0))
+			target.stop_highlight()
 			target = _get_closest_zero_in_range(here, r)
-		here.set_color(Color(0, 0, 0, 0))
+		here.stop_highlight()
 
 
 	func _solve():

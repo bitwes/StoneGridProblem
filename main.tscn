@@ -32,9 +32,17 @@ layout_mode = 2
 layout_mode = 2
 text = "3 x 3"
 
+[node name="SevenXSeven" type="Button" parent="Controls/Layout/Buttons/Layouts"]
+layout_mode = 2
+text = "7 x 7"
+
 [node name="TenXTen" type="Button" parent="Controls/Layout/Buttons/Layouts"]
 layout_mode = 2
 text = "10 x 10"
+
+[node name="FifteenXFifteen" type="Button" parent="Controls/Layout/Buttons/Layouts"]
+layout_mode = 2
+text = "15 x 15"
 
 [node name="Spacer2" type="CenterContainer" parent="Controls/Layout/Buttons"]
 layout_mode = 2
@@ -138,7 +146,9 @@ offset_bottom = 614.0
 min_value = -1.0
 
 [connection signal="pressed" from="Controls/Layout/Buttons/Layouts/ThreeXThree" to="." method="_on_three_x_three_pressed"]
+[connection signal="pressed" from="Controls/Layout/Buttons/Layouts/SevenXSeven" to="." method="_on_seven_x_seven_pressed"]
 [connection signal="pressed" from="Controls/Layout/Buttons/Layouts/TenXTen" to="." method="_on_ten_x_ten_pressed"]
+[connection signal="pressed" from="Controls/Layout/Buttons/Layouts/FifteenXFifteen" to="." method="_on_fifteen_x_fifteen_pressed"]
 [connection signal="pressed" from="Controls2/Layout/Stop" to="." method="_on_stop_pressed"]
 [connection signal="pressed" from="Controls2/Layout/Buttons/Solvers/ThisOne" to="." method="_on_this_one_pressed"]
 [connection signal="pressed" from="Controls2/Layout/Buttons/Solvers/PushUntil" to="." method="_on_push_until_pressed"]
