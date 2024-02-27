@@ -26,6 +26,7 @@ var StoneGridScene = load("res://stone_grid.tscn")
 	checks = $Layout/Controls2/Layout/Buttons/Stats/Checks,
 	passes = $Layout/Controls2/Layout/Buttons/Stats/Passes,
 	solver_buttons = $Layout/Controls2/Layout/Buttons/Solvers,
+	resume = $Layout/Controls2/Layout/Resume,
 
 	undo_slider = $Layout/CenterBox/UndoSlider,
 }
@@ -39,9 +40,11 @@ var solver = Solvers.BestIdea.new() :
 	get: return solver
 	set(val):
 		solver = val
+		solver.paused.connect(_on_solver_paused)
 
 
 func _ready():
+	_ctrls.resume.visible = false
 	_ctrls.orig_stone_grid.visible = false
 	_stone_grid = _ctrls.orig_stone_grid
 	_ctrls.stop.visible = false
@@ -181,6 +184,17 @@ func _on_solver_button_pressed(solver_class):
 func _on_stop_pressed():
 	solver.stop()
 
+var _pause_object = null
+func _on_solver_paused(po):
+	_pause_object = po
+	_ctrls.resume.visible = true
+
+func _on_resume_pressed():
+	_ctrls.resume.visible = false
+	_emit_resume.call_deferred()
+
+func _emit_resume():
+	_pause_object.resume.emit()
 
 
 # ------------------------
@@ -211,6 +225,8 @@ func solve():
 	_ctrls.passes.text = str('Passes:  ', solver.passes)
 	_ctrls.undo_slider.editable = true
 	#_stone_grid.show_change_counts()
+
+
 
 
 

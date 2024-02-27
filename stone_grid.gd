@@ -111,6 +111,7 @@ var StoneButtonScene = load('res://stone_button.tscn')
 var _from : StoneButton = null
 var _stone_buttons = []
 var _last_layout = null
+var _manual_solver = Solvers.BaseSolver.new()
 
 var from_color = Color(1, 0, 0)
 var to_color = Color(0, 1, 0)
@@ -144,6 +145,7 @@ var _cur_color_index = 0
 
 func _ready():
 	_ctrls.edit_buttons.visible = false
+	_manual_solver._grid = self
 
 
 func _animate_move(from_btn : StoneButton, to_btn : StoneButton, duration : float):
@@ -221,7 +223,8 @@ func _on_stone_button_pressed(which : StoneButton):
 			else:
 				_from = which
 		else:
-			move_stone(_from.grid_pos, which.grid_pos)
+			_manual_solver.push_and_fill_until_there(_from.grid_pos, which)
+			# move_stone(_from.grid_pos, which.grid_pos)
 			_from.button_pressed = false
 			_from.release_focus()
 			which.button_pressed = false
@@ -242,6 +245,10 @@ func _on_clear_pressed():
 
 func _on_print_array_pressed():
 	print_board_array()
+
+
+func _on_color_stones_pressed():
+	color_starting_stones()
 
 
 # ------------------------
@@ -386,6 +393,7 @@ func get_num_wrong():
 	var num_wrong = 0
 	for i in range(grid_size()):
 		for j in range(grid_size()):
+			print(_stone_buttons[i][j])
 			if(_stone_buttons[i][j].get_stone_count() > 1):
 				num_wrong += 1
 	return num_wrong
@@ -429,3 +437,5 @@ func color_starting_stones():
 		if(btn.get_stone_count() > 1):
 			btn.set_bg_color(_next_color())
 	)
+
+

@@ -115,6 +115,10 @@ horizontal_alignment = 2
 layout_mode = 2
 text = "Stop"
 
+[node name="Resume" type="Button" parent="Layout/Controls2/Layout"]
+layout_mode = 2
+text = "Resume"
+
 [node name="Buttons" type="VBoxContainer" parent="Layout/Controls2/Layout"]
 layout_mode = 2
 size_flags_vertical = 3
@@ -162,5 +166,6 @@ text = "Reset"
 [connection signal="pressed" from="Layout/Controls/Layout/Buttons/Layouts/TenXTen" to="." method="_on_ten_x_ten_pressed"]
 [connection signal="pressed" from="Layout/Controls/Layout/Buttons/Layouts/FifteenXFifteen" to="." method="_on_fifteen_x_fifteen_pressed"]
 [connection signal="pressed" from="Layout/Controls2/Layout/Stop" to="." method="_on_stop_pressed"]
+[connection signal="pressed" from="Layout/Controls2/Layout/Resume" to="." method="_on_resume_pressed"]
 [connection signal="pressed" from="Layout/Controls2/Layout/Buttons/Solve" to="." method="_on_solve_pressed"]
 [connection signal="pressed" from="Layout/Controls2/Layout/Buttons/Reset" to="." method="_on_reset_pressed"]
