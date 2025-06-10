@@ -108,10 +108,10 @@ const MODES = {
 
 var StoneButtonScene = load('res://stone_button.tscn')
 
-var _from : StoneButton = null
+
 var _stone_buttons = []
 var _last_layout = null
-var _manual_solver = Solvers.BaseSolver.new()
+
 
 var from_color = Color(1, 0, 0)
 var to_color = Color(0, 1, 0)
@@ -143,9 +143,13 @@ var _cur_color_index = 0
 	edit_plus = $Layout/Header2/EditButtons/Plus,
 }
 
+
+signal stone_pressed(which : StoneButton)
+signal stone_button_gui_input(which : StoneButton, event : InputEvent)
+
+
 func _ready():
 	_ctrls.edit_buttons.visible = false
-	_manual_solver._grid = self
 
 
 func _animate_move(from_btn : StoneButton, to_btn : StoneButton, duration : float):
@@ -215,21 +219,8 @@ func _on_stone_button_pressed(which : StoneButton):
 	if(which.edit_mode):
 		_update_count()
 	else:
-		if(_from == which):
-			return
-		elif(_from == null):
-			if(which.get_stone_count() == 0):
-				which.button_pressed = false
-			else:
-				_from = which
-		else:
-			_manual_solver.push_and_fill_until_there(_from.grid_pos, which)
-			# move_stone(_from.grid_pos, which.grid_pos)
-			_from.button_pressed = false
-			_from.release_focus()
-			which.button_pressed = false
-			which.release_focus()
-			_from = null
+		stone_pressed.emit(which)
+
 
 
 func _on_plus_pressed():
@@ -322,12 +313,14 @@ func set_grid_size(s):
 		for j in range(s):
 			var b = StoneButtonScene.instantiate()
 			b.pressed.connect(_on_stone_button_pressed.bind(b))
+			b.gui_input.connect(func(event): stone_button_gui_input.emit(b, event))
 			b.grid_pos.x = i
 			b.grid_pos.y = j
 			b.custom_minimum_size = Vector2(20, 20)
 			r.add_child(b)
 			b.stones_changed.connect(_on_stones_changed)
 			_stone_buttons[i][j] = b
+
 
 func _populate_array(stones):
 	_last_layout = stones
@@ -352,6 +345,7 @@ func populate(stones):
 		_populate_array(stones)
 	elif(typeof(stones) == TYPE_DICTIONARY):
 		_populate_dictionary(stones)
+	color_starting_stones()
 
 
 func reload_layout():
@@ -437,5 +431,3 @@ func color_starting_stones():
 		if(btn.get_stone_count() > 1):
 			btn.set_bg_color(_next_color())
 	)
-
-

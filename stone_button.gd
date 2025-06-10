@@ -179,8 +179,11 @@ func take_stone():
 	_update_display()
 	stones_changed.emit()
 	_change_count += 1
+	if(_stones.size() == 0):
+		set_bg_color(default_bg_color)
 
 	return s
+
 
 func set_stone_count(x):
 	_stones.clear()

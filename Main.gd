@@ -34,6 +34,7 @@ var StoneGridScene = load("res://stone_grid.tscn")
 var _stone_grid : StoneGrid = null
 var _running = false
 var _start_time = 0.0
+var _player : StoneGridPlayer = StoneGridPlayer.new()
 
 
 var solver = Solvers.BestIdea.new() :
@@ -106,6 +107,7 @@ func _create_stone_grid(size : int, arrangements : Dictionary):
 	_make_populate_buttons(arrangements)
 	if(arrangements.keys().size() > 0):
 		_stone_grid.populate(arrangements[arrangements.keys()[0]])
+	_player.stone_grid = _stone_grid
 
 
 func _make_populate_buttons(arrangements):
@@ -121,7 +123,9 @@ func _make_populate_buttons(arrangements):
 		btn.button_group = g
 		_ctrls.stone_arrangements.add_child(btn)
 
-		btn.pressed.connect(func():  _stone_grid.populate(arrangements[key]))
+		btn.pressed.connect(func():
+			_stone_grid.populate(arrangements[key])
+		)
 		if(first):
 			btn.button_pressed = true
 			btn.pressed.emit()
@@ -181,17 +185,21 @@ func _on_reset_pressed():
 func _on_solver_button_pressed(solver_class):
 	solver = solver_class.new()
 
+
 func _on_stop_pressed():
 	solver.stop()
+
 
 var _pause_object = null
 func _on_solver_paused(po):
 	_pause_object = po
 	_ctrls.resume.visible = true
 
+
 func _on_resume_pressed():
 	_ctrls.resume.visible = false
 	_emit_resume.call_deferred()
+
 
 func _emit_resume():
 	_pause_object.resume.emit()
@@ -225,9 +233,3 @@ func solve():
 	_ctrls.passes.text = str('Passes:  ', solver.passes)
 	_ctrls.undo_slider.editable = true
 	#_stone_grid.show_change_counts()
-
-
-
-
-
-

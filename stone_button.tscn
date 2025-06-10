@@ -2,12 +2,12 @@
 
 [ext_resource type="Script" path="res://stone_button.gd" id="1_77fbw"]
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mvq26"]
+bg_color = Color(0.407843, 0.321569, 0.176471, 1)
+
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_kstmi"]
 resource_local_to_scene = true
 bg_color = Color(0.0823529, 0.0823529, 0.0823529, 1)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mvq26"]
-bg_color = Color(0.407843, 0.321569, 0.176471, 1)
 
 [node name="StoneButton" type="Button"]
 anchors_preset = 15
@@ -15,8 +15,8 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_styles/normal = SubResource("StyleBoxFlat_kstmi")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_mvq26")
+theme_override_styles/normal = SubResource("StyleBoxFlat_kstmi")
 script = ExtResource("1_77fbw")
 
 [node name="ColorRect" type="ColorRect" parent="."]
