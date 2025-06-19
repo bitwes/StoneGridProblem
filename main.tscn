@@ -1,6 +1,6 @@
 [gd_scene load_steps=5 format=3 uid="uid://csev13x31xq06"]
 
-[ext_resource type="Script" path="res://Main.gd" id="1_3lrxg"]
+[ext_resource type="Script" uid="uid://dihnihkk36k0g" path="res://Main.gd" id="1_3lrxg"]
 [ext_resource type="PackedScene" uid="uid://f1piuchuokq" path="res://stone_grid.tscn" id="2_153bm"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_xw0go"]

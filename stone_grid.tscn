@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://f1piuchuokq"]
 
-[ext_resource type="Script" path="res://stone_grid.gd" id="1_pcr08"]
+[ext_resource type="Script" uid="uid://dxydls42peorl" path="res://stone_grid.gd" id="1_pcr08"]
 
 [node name="StoneGrid" type="Control"]
 clip_contents = true
